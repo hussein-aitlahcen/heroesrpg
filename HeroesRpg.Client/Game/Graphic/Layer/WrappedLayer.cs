@@ -1,4 +1,5 @@
 ﻿using CocosSharp;
+using HeroesRpg.Client.Game.Graphic.Layer.HUD;
 using System;
 using System.Collections.Generic;
 using System.Linq;

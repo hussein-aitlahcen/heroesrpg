@@ -10,7 +10,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
     /// <summary>
     /// 
     /// </summary>
-    public sealed class BackgroungLayer : WrappedLayer
+    public class BackgroungLayer : WrappedLayer
     {
         /// <summary>
         /// 

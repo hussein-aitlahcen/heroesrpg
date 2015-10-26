@@ -18,21 +18,26 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
     /// 
     /// </summary>
     public sealed class LoginLayer : WrappedLayer
-    {
+    {        
         /// <summary>
         /// 
         /// </summary>
         public LoginLayer()
         {
-            Color = CCColor3B.Orange;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         protected override void AddedToScene()
         {
             base.AddedToScene();
             AddChild(BackgroungLayer.LOGIN_GOKU);
             AddChild(LoginHUD.Instance);
-            AddChild(new Label("Connexion", CCColor3B.Black) { Position = new CCPoint(VisibleBoundsWorldspace.MidX, VisibleBoundsWorldspace.MaxY - 15), AnchorPoint = CCPoint.AnchorMiddleTop });
+            AddChild(new Label("Connexion", CCColor3B.Black)
+            {
+                Position = new CCPoint(VisibleBoundsWorldspace.MidX, VisibleBoundsWorldspace.MaxY - 15), AnchorPoint = CCPoint.AnchorMiddleTop
+            });            
         }
     }
 }

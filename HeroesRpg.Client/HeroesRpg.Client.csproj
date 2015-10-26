@@ -13,6 +13,21 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <PublishUrl>publier\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -49,6 +64,7 @@
     <Compile Include="Game\Graphic\Element\LoadingLabel.cs" />
     <Compile Include="Game\Graphic\Layer\BackgroungLayer.cs" />
     <Compile Include="Game\Graphic\Layer\FakeLoadingLayer.cs" />
+    <Compile Include="Game\Graphic\Layer\GameMapLayer.cs" />
     <Compile Include="Game\Graphic\Layer\HUD\LoginHUD.cs" />
     <Compile Include="Game\Graphic\Layer\HUD\WrappedHUD.cs" />
     <Compile Include="Game\Graphic\Layer\WrappedLayer.cs" />
@@ -59,12 +75,11 @@
     <Compile Include="Game\Graphic\Scene\GameScene.cs" />
     <Compile Include="Game\Graphic\Scene\LoginScene.cs" />
     <Compile Include="Game\Graphic\Scene\WrappedScene.cs" />
-    <Compile Include="Game\Graphic\UI\BasicUI.cs" />
     <Compile Include="Game\Sound\SoundPlayer.cs" />
     <Compile Include="Game\Util\InputHelper.cs" />
     <Compile Include="Game\World\Engine\ActorEngine.cs" />
     <Compile Include="Game\World\Entity\AnimatedEntity.cs" />
-    <Compile Include="Game\World\Entity\Impl\Animation\Animations.cs" />
+    <Compile Include="Game\World\Entity\Impl\Animated\Animation.cs" />
     <Compile Include="Game\World\Entity\Impl\EntityFactory.cs" />
     <Compile Include="Game\World\Entity\GameObject.cs" />
     <Compile Include="Game\World\Entity\Impl\Hero.cs" />
@@ -80,6 +95,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Texture\SpriteSheetCache.cs" />
+    <Compile Include="Game\Graphic\UI\BasicUI.cs" />
     <Compile Include="Game\Graphic\UI\BasicUI.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -202,7 +218,18 @@
       <Name>HeroesRpg.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 et x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

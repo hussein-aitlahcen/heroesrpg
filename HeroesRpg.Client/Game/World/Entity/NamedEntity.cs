@@ -13,7 +13,7 @@ namespace HeroesRpg.Client.Game.World.Entity
     /// </summary>
     public abstract class NamedEntity : AnimatedEntity
     {
-        public const int NAME_LABEL_HEIGHT = 5;
+        public const int NAME_LABEL_HEIGHT = 15;
 
         /// <summary>
         /// 
@@ -43,7 +43,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             AddChild(NameLabel = new Label(name, CCColor3B.Black)
             {
                 AnchorPoint = CCPoint.AnchorMiddle,
-                Scale = 0.40f,
+                Scale = 0.50f,
             });
         }
         
@@ -52,7 +52,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// </summary>
         public override void OnFrameChanged()
         {
-            NameLabel.Position = new CCPoint(PositionX + (ContentSize.Width / 2), PositionY + ContentSize.Height + NAME_LABEL_HEIGHT);
+            NameLabel.Position = new CCPoint(ContentSize.Width / 2, ContentSize.Height + NAME_LABEL_HEIGHT);
         }
     }
 }

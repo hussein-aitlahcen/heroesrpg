@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Box2D.Collision.Shapes;
 
 namespace HeroesRpg.Client.Game.World.Entity.Impl
 {
@@ -74,6 +75,17 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         {
             Breed = (HeroEnum)breedId;
             BreedData = GetHeroDataById(Breed);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override b2Shape CreatePhysicsShape(int ptm)
+        {
+            var shape = new b2PolygonShape();
+            shape.SetAsBox(ContentSize.Width / ptm, ContentSize.Height / ptm);
+            return shape;
         }
     }
 }

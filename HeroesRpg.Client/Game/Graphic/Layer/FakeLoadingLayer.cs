@@ -15,6 +15,8 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         protected override void AddedToScene()
         {
             base.AddedToScene();
+
+            Schedule(Update);
         }
 
         public override void Update(float dt)

@@ -7,6 +7,7 @@ using HeroesRpg.Common.Manager;
 using HeroesRpg.Client.Game.Graphic;
 using EmptyKeys.UserInterface;
 using Microsoft.Xna.Framework.Graphics;
+using EmptyKeys.UserInterface.Themes;
 
 namespace HeroesRpg.Client
 {
@@ -32,6 +33,7 @@ namespace HeroesRpg.Client
             // CCSceneResolutionPolicy.ShowAll will ensure that the aspect ratio is preserved
             CCScene.SetDefaultDesignResolution(desiredWidth, desiredHeight, CCSceneResolutionPolicy.ShowAll);
 
+            mainWindow.AllowUserResizing = false;
             //mainWindow.AllowUserResizing = false;
 
             //// Determine whether to use the high or low def versions of our images
@@ -47,7 +49,8 @@ namespace HeroesRpg.Client
             //    application.ContentSearchPaths.Add("ld");
             //    CCSprite.DefaultTexelToContentSizeRatio = 1.0f;
             //}
-            
+
+            ResourceDictionary.DefaultDictionary = Light.GetThemeDictionary();
             SpriteFont font = CCContentManager.SharedContentManager.Load<SpriteFont>("fonts/Segoe_UI_10_Regular");
             FontManager.DefaultFont = Engine.Instance.Renderer.CreateFont(font);
             FontManager.Instance.LoadFonts(CCContentManager.SharedContentManager, "fonts");

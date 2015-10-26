@@ -1,4 +1,6 @@
-﻿using CocosSharp;
+﻿using Box2D.Common;
+using CocosSharp;
+using HeroesRpg.Client.Game.World.Entity.Impl.Animated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,25 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        public Animation CurrentAnimation
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public CCFiniteTimeAction AnimationAction
+        {
+            get;
+            private set;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="id"></param>
         public AnimatedEntity(int id) : base(id)
         {
@@ -37,21 +58,41 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// 
         /// </summary>
         /// <param name="animation"></param>
-        public virtual void StartAnimation(string animation, bool repeat = true, float delay = 0.20f)
+        public virtual void StartAnimation(Animation animation, bool repeat = true)
         {
-            var animationFrames = SpriteSheet.Frames.FindAll((x) => x.TextureFilename.StartsWith(animation));
-            CCFiniteTimeAction action = new CCAnimate(new CCAnimation(animationFrames, delay));
+            if (CurrentAnimation == animation)
+                return;
+            CurrentAnimation = animation;
+
+            var realLinearVelocity = new b2Vec2(FlipX ? -animation.LinearVelocity.x : animation.LinearVelocity.x, -animation.LinearVelocity.y);
+            ApplyLinearVelocity(realLinearVelocity);
+
+            var animationFrames = GetAnimationSprites(animation.RawSprite);
+            SpriteFrame = animationFrames.First();
+
+            if (AnimationAction != null)
+                StopAction(AnimationAction.Tag);
+            AnimationAction = new CCAnimate(new CCAnimation(animationFrames, animation.SpriteDelay));
             if (repeat)
-                action = new CCRepeatForever(action);
-            RunAction(action);
+                AnimationAction = new CCRepeatForever(AnimationAction);
+            AnimationAction.Tag = TAG_CURRENT_ANIMATION;
+            RunAction(AnimationAction);
+
             OnFrameChanged();
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public List<CCSpriteFrame> GetAnimationSprites(string animation) => SpriteSheet.Frames.FindAll((x) => x.TextureFilename.StartsWith(animation));
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="contains"></param>
-        public virtual void SetInitialFrame(string contains)
+        public virtual void SetSpriteFrame(string contains)
         {
             SpriteFrame = SpriteSheet.Frames.First(frame => frame.TextureFilename.StartsWith(contains));
             OnFrameChanged();

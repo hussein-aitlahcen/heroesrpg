@@ -3,20 +3,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ek="clr-namespace:EmptyKeys.UserInterface.Designer;assembly=EmptyKeys.UserInterface.Designer"
-             mc:Ignorable="d" FontSize="10pt" Width="1024" Height="768"
-                 FontFamily="Segoe UI" Background="Transparent">
-    <Grid>
-        <StackPanel>
-            <TextBlock TextWrapping="Wrap" Text="Nom de compte" HorizontalAlignment="Center"
-                       FontSize="15pt" FontWeight="Bold" FontFamily="Segoe UI" Margin="10" Foreground="Black" />
-            <TextBox x:Name="txtBoxAccount" HorizontalAlignment="Center"
-                     TextWrapping="Wrap" Text="" Width="120" Foreground="LightGray"/>
-            <TextBlock TextWrapping="Wrap" Text="Mot de passe" HorizontalAlignment="Center" Margin="10" VerticalAlignment="Center" 
+             mc:Ignorable="d" FontSize="10pt" FontFamily="Segoe UI" Background="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Margin="10">
+            <TextBlock  TextWrapping="Wrap" Text="Nom de compte" HorizontalAlignment="Center" Margin="0,0,0,5"
                        FontSize="15pt" FontWeight="Bold" FontFamily="Segoe UI" Foreground="Black" />
-            <PasswordBox x:Name="pwdBox" HorizontalAlignment="Center" VerticalAlignment="Top" Width="120"
-                     Foreground="LightGray" />
-            <Button x:Name="btnConnection" Content="Connexion" HorizontalAlignment="Center" Margin="10" Width="120"
-                     Foreground="LightGray"/>
+            <TextBox  x:Name="txtBoxAccount" HorizontalAlignment="Center"  Height="25"
+                     TextWrapping="Wrap" Text="" Width="120" Foreground="Black"/>
         </StackPanel>
-    </Grid>
+        <StackPanel Grid.Row="1" Margin="10">
+            <TextBlock TextWrapping="Wrap" Text="Mot de passe" HorizontalAlignment="Center"  Margin="0,0,0,5"
+                       FontSize="15pt" FontWeight="Bold" FontFamily="Segoe UI" Foreground="Black" />
+                <PasswordBox x:Name="pwdBox" HorizontalAlignment="Center" Width="120" Height="25"
+                     Foreground="Black" />
+            </StackPanel>
+            <Button Grid.Row="2" Margin="10" x:Name="btnConnection" Content="Connexion" HorizontalAlignment="Center"
+                    Width="120" Foreground="Black"/>
+        </Grid>
 </ek:UIRoot>

@@ -1,4 +1,5 @@
 ﻿using CocosSharp;
+using HeroesRpg.Client.Game.Graphic.Element;
 using HeroesRpg.Client.Game.Graphic.Layer;
 using HeroesRpg.Client.Game.Sound;
 using HeroesRpg.Client.Game.Util;
@@ -40,7 +41,7 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             get;
             private set;
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -58,7 +59,7 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
                 OnKeyReleased = OnKeyReleased,
             });
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -101,18 +102,30 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        protected virtual void OnKeyReleased(CCEventKeyboard ev) => InputHelper.Instance.OnKeyRelease(ev.Keys);
+        protected virtual void OnKeyReleased(CCEventKeyboard ev)
+        {
+            InputHelper.Instance.OnKeyRelease(ev.Keys);            
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        protected virtual void OnMouseDown(CCEventMouse ev) => InputHelper.Instance.OnMousePress(ev.MouseButton);
+        protected virtual void OnMouseDown(CCEventMouse ev)
+        {
+            if(VisibleBoundsScreenspace.ContainsPoint(ev.CursorX, ev.CursorY))
+            { 
+                InputHelper.Instance.OnMousePress(ev.MouseButton);
+            }
+        }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="ev"></param>
-        protected virtual void OnMouseUp(CCEventMouse ev) => InputHelper.Instance.OnMouseRelease(ev.MouseButton);
+        protected virtual void OnMouseUp(CCEventMouse ev)
+        {
+            InputHelper.Instance.OnMouseRelease(ev.MouseButton);
+        }
     }
 }

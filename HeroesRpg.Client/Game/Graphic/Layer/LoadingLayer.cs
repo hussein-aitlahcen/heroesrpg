@@ -1,6 +1,7 @@
 ﻿using CocosSharp;
 using HeroesRpg.Client.Game.Graphic.Element;
 using HeroesRpg.Client.Game.World.Entity.Impl;
+using HeroesRpg.Client.Game.World.Entity.Impl.Animated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,9 +45,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         {
             m_loadingHero = new Hero(0, 10, "Broly") { Position = new CCPoint(0, 15) };
             m_loadingHero.Scale = 1.3f;
-            m_loadingHero.SetInitialFrame("stand");
-            m_loadingHero.StartAnimation("walk");
-
+            m_loadingHero.StartAnimation(Animation.WALK);
             ZOrder = int.MaxValue;
         }
 
@@ -63,9 +62,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             AddChild(new LoadingLabel("Chargement", CCColor3B.Black) { Position = new CCPoint(15, bounds.MaxY - 15) });
             AddChild(m_loadingHero);
 
-            MoveHero();
-
-            Schedule(Update);
+            MoveHero();            
         }
 
         /// <summary>
