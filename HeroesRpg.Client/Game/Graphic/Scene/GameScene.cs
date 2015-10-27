@@ -56,7 +56,7 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
                 case CCKeys.Space:
                     //to change velocity by 10
                     float impulse = m_hero.PhysicsBody.Mass * 10;
-                    m_hero.PhysicsBody.ApplyLinearImpulse(new b2Vec2(0, impulse), m_hero.PhysicsBody.WorldCenter);
+                    m_hero.ApplyLinearImpulseToCenter(new b2Vec2(0, impulse));
                     break;
 
                 case CCKeys.Left:

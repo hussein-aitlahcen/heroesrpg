@@ -53,6 +53,8 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="name"></param>
         public CombatEntity(int id) : base(id)
         {
+            MaxLife = 100;
+            CurrentLife = 50;
             AddDecoration(new CurrentLifeDecoration(CurrentLife, MaxLife));
         }
     }

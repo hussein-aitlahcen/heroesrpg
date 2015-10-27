@@ -23,7 +23,7 @@ namespace HeroesRpg.Client.Game.Graphic.Element
 
         public int CurrentEnergy { get; private set; }  
         public int MaxEnergy { get; private set; }      
-        public float Ratio { get { return CurrentEnergy / Math.Max(1, MaxEnergy); } }
+        public float Ratio { get { return CurrentEnergy / (float)Math.Max(1, MaxEnergy); } }
         public float Width { get; set; }
         public float Height { get; set; }   
         public float MidWidth { get { return Width / 2; } }
