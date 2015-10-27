@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Box2D.Collision.Shapes;
+using HeroesRpg.Client.Game.World.Entity.Impl.Decoration;
 
 namespace HeroesRpg.Client.Game.World.Entity.Impl
 {
@@ -41,7 +42,7 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
     /// <summary>
     /// 
     /// </summary>
-    public sealed partial class Hero : NamedEntity
+    public sealed partial class Hero : CombatEntity
     {
         /// <summary>
         /// 
@@ -71,20 +72,22 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         /// </summary>
         /// <param name="heroType"></param>
         /// <param name="id"></param>
-        public Hero(int breedId, int id, string name) : base(id, name)
+        public Hero(int breedId, int id, string name) : base(id)
         {
             Breed = (HeroEnum)breedId;
             BreedData = GetHeroDataById(Breed);
+
+            AddDecoration(new NameDecoration(name, CCColor3B.Orange));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override b2Shape CreatePhysicsShape(int ptm)
+        public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(ContentSize.Width / ptm, ContentSize.Height / ptm);
+            shape.SetAsBox(ScaledContentSize.Width / PtmRatio, ScaledContentSize.Height / PtmRatio);
             return shape;
         }
     }

@@ -12,8 +12,8 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Animated
     /// </summary>
     public sealed class Animation
     {
-        public static Animation STAND = new Animation("stand", 0.35f, new b2Vec2(0, 0));
-        public static Animation WALK = new Animation("walk", 0.20f, new b2Vec2(5, 0));
+        public static Animation STAND = new Animation("stand", 0.45f);
+        public static Animation WALK = new Animation("walk", 0.20f);
 
         /// <summary>
         /// 
@@ -32,25 +32,15 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Animated
             get;
             private set;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public b2Vec2 LinearVelocity
-        {
-            get;
-            private set;
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="rawSprite"></param>
-        public Animation(string rawSprite, float delay, b2Vec2 linearVelocity)
+        public Animation(string rawSprite, float delay)
         {
             RawSprite = rawSprite;
             SpriteDelay = delay;
-            LinearVelocity = linearVelocity;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer.HUD
     /// <summary>
     /// 
     /// </summary>
-    public sealed class LoginHUD : WrappedHUD<LoginHUD, BasicUI>
+    public sealed class LoginHUD : WrappedHUD<LoginHUD, LoginUI>
     {
         public TextBox TxtAccount => UI.TxtBoxAccount;
         public PasswordBox TxtPassword => UI.PwdBoxPassword;

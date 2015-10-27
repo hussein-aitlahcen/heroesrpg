@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EmptyKeys.UserInterface.Generated
 {
-    public partial class BasicUI
+    public partial class LoginUI
     {
         public TextBox TxtBoxAccount => txtBoxAccount;
         public Button BtnConnection => btnConnection;

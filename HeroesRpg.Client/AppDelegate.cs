@@ -22,6 +22,7 @@ namespace HeroesRpg.Client
             SharedWindow = mainWindow;
 
             application.ContentRootDirectory = "Content";
+            application.PreferMultiSampling = true;
             var windowSize = mainWindow.WindowSizeInPixels;
 
             var desiredWidth = 1024.0f;

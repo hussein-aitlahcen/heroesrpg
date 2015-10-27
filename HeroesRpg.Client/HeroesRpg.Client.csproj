@@ -61,6 +61,7 @@
     <Compile Include="Data\Actor\ActorFactory.cs" />
     <Compile Include="Data\Actor\Exception\UnknowActorTypeException.cs" />
     <Compile Include="Game\Graphic\Element\Label.cs" />
+    <Compile Include="Game\Graphic\Element\EnergyBar.cs" />
     <Compile Include="Game\Graphic\Element\LoadingLabel.cs" />
     <Compile Include="Game\Graphic\Layer\BackgroungLayer.cs" />
     <Compile Include="Game\Graphic\Layer\FakeLoadingLayer.cs" />
@@ -79,14 +80,21 @@
     <Compile Include="Game\Util\InputHelper.cs" />
     <Compile Include="Game\World\Engine\ActorEngine.cs" />
     <Compile Include="Game\World\Entity\AnimatedEntity.cs" />
+    <Compile Include="Game\World\Entity\DecoratedEntity.cs" />
     <Compile Include="Game\World\Entity\Impl\Animated\Animation.cs" />
+    <Compile Include="Game\World\Entity\Impl\Decoration\CurrentLifeDecoration.cs" />
+    <Compile Include="Game\World\Entity\Impl\Decoration\LabeledDecoration.cs" />
+    <Compile Include="Game\World\Entity\Impl\Decoration\EnergyBarDecoration.cs" />
+    <Compile Include="Game\World\Entity\Impl\Decoration\NameDecoration.cs" />
     <Compile Include="Game\World\Entity\Impl\EntityFactory.cs" />
     <Compile Include="Game\World\Entity\GameObject.cs" />
     <Compile Include="Game\World\Entity\Impl\Hero.cs" />
     <Compile Include="Game\World\Entity\Impl\UnknowHeroBreedException.cs" />
+    <Compile Include="Game\World\Entity\CombatEntity.cs" />
     <Compile Include="Game\World\Entity\MovableEntity.cs" />
-    <Compile Include="Game\World\Entity\NamedEntity.cs" />
+    <Compile Include="Game\World\Entity\EntityDecoration.cs" />
     <Compile Include="Game\World\Entity\StaticEntity.cs" />
+    <Compile Include="GlobalConfig.cs" />
     <Compile Include="Manager\ManagerEnum.cs" />
     <Compile Include="Manager\SpriteManager.cs" />
     <Compile Include="Data\Actor\ActorData.cs" />
@@ -95,8 +103,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Texture\SpriteSheetCache.cs" />
-    <Compile Include="Game\Graphic\UI\BasicUI.cs" />
-    <Compile Include="Game\Graphic\UI\BasicUI.xaml.cs" />
+    <Compile Include="Game\Graphic\UI\LoginUI.cs" />
+    <Compile Include="Game\Graphic\UI\LoginUI.xaml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="BitMiracle.LibTiff.NET, Version=2.3.624.0, Culture=neutral, processorArchitecture=MSIL">

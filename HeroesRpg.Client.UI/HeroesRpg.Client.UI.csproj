@@ -58,8 +58,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicUI.xaml.cs">
-      <DependentUpon>BasicUI.xaml</DependentUpon>
+    <Compile Include="LoginUI.xaml.cs">
+      <DependentUpon>LoginUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -93,7 +93,7 @@
     <Resource Include="license.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="BasicUI.xaml">
+    <Page Include="LoginUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

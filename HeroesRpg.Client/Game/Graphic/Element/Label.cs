@@ -15,7 +15,7 @@ namespace HeroesRpg.Client.Game.Graphic.Element
         /// <summary>
         /// 
         /// </summary>
-        public const string FONT = "fonts/MarkerFelt";
+        public const string FONT = "fonts/Segoe_UI_15_Bold";
         
         /// <summary>
         /// 
@@ -23,7 +23,7 @@ namespace HeroesRpg.Client.Game.Graphic.Element
         /// <param name="message"></param>
         /// <param name="size"></param>
         /// <param name="color"></param>
-        public Label(string message, CCColor3B color) : base(message, FONT, 22, CCLabelFormat.SpriteFont)
+        public Label(string message, CCColor3B color) : base(message, FONT, 15, CCLabelFormat.SpriteFont)
         {
             Color = color;
             AnchorPoint = CCPoint.AnchorUpperLeft;

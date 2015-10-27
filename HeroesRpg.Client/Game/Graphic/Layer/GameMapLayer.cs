@@ -45,7 +45,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// </summary>
         public GameMapLayer()
         {
-            Color = CCColor3B.White;
+            Color = CCColor3B.Gray;
 
             Floor = new CCDrawNode();
             
@@ -74,7 +74,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         {
             CCSize s = LayerSizeInPixels;
 
-            var gravity = new b2Vec2(0.0f, -10.0f);
+            var gravity = new b2Vec2(0.0f, -22.0f);
 
             World = new b2World(gravity);
 
@@ -86,9 +86,10 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
 
             var groundBox = new b2PolygonShape();
             groundBox.SetAsBox(s.Width, 0 / PTM_RATIO);
-
+            
             var fd = new b2FixtureDef();
             fd.shape = groundBox;
+            fd.friction = 0f;
 
             groundBody.CreateFixture(fd);
         }

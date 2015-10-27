@@ -57,16 +57,31 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        public override void OnStand()
+        {
+            base.OnStand();
+            StartAnimation(Animation.STAND);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void OnMove()
+        {
+            base.OnMove();
+            StartAnimation(Animation.WALK);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="animation"></param>
-        public virtual void StartAnimation(Animation animation, bool repeat = true)
+        public virtual bool StartAnimation(Animation animation, bool repeat = true)
         {
             if (CurrentAnimation == animation)
-                return;
+                return false;
             CurrentAnimation = animation;
-
-            var realLinearVelocity = new b2Vec2(FlipX ? -animation.LinearVelocity.x : animation.LinearVelocity.x, -animation.LinearVelocity.y);
-            ApplyLinearVelocity(realLinearVelocity);
-
+            
             var animationFrames = GetAnimationSprites(animation.RawSprite);
             SpriteFrame = animationFrames.First();
 
@@ -79,6 +94,8 @@ namespace HeroesRpg.Client.Game.World.Entity
             RunAction(AnimationAction);
 
             OnFrameChanged();
+
+            return true;
         }
 
         /// <summary>
@@ -103,6 +120,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// </summary>
         public virtual void OnFrameChanged()
         {
+            ComputeDecorationPositions();
         }
     }
 }

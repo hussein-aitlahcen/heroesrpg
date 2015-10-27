@@ -40,34 +40,52 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             m_hero.StartAnimation(Animation.STAND);
 
             MapLayer.AddGameObject(m_hero);
-
+          
             Schedule(Update);
+        }
+                        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ev"></param>
+        protected override void OnKeyPressed(CCEventKeyboard ev)
+        {
+            base.OnKeyPressed(ev);
+            switch (ev.Keys)
+            {
+                case CCKeys.Space:
+                    //to change velocity by 10
+                    float impulse = m_hero.PhysicsBody.Mass * 10;
+                    m_hero.PhysicsBody.ApplyLinearImpulse(new b2Vec2(0, impulse), m_hero.PhysicsBody.WorldCenter);
+                    break;
+
+                case CCKeys.Left:
+                    m_hero.MovementX--;
+                    break;
+
+                case CCKeys.Right:
+                    m_hero.MovementX++;
+                    break;
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="dt"></param>
-        public override void Update(float dt)
+        /// <param name="ev"></param>
+        protected override void OnKeyReleased(CCEventKeyboard ev)
         {
-            base.Update(dt);
+            base.OnKeyReleased(ev);
+            switch (ev.Keys)
+            {
+                case CCKeys.Left:
+                    m_hero.MovementX++;
+                    break;
 
-            Animation animation = null;
-            if(InputHelper.Instance.IsKeyIn(CCKeys.Left))
-            {
-                animation = Animation.WALK;
-                m_hero.FlipX = true;
+                case CCKeys.Right:
+                    m_hero.MovementX--;
+                    break;
             }
-            else if(InputHelper.Instance.IsKeyIn(CCKeys.Right))
-            {
-                animation = Animation.WALK;
-                m_hero.FlipX = false;
-            }
-            else
-            {
-                animation = Animation.STAND;
-            }
-            m_hero.StartAnimation(animation);
         }
     }
 }

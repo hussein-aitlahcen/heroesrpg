@@ -21,7 +21,7 @@ namespace EmptyKeys.UserInterface.Generated {
     
     
     [GeneratedCodeAttribute("Empty Keys UI Generator", "1.10.0.0")]
-    public partial class BasicUI : UIRoot {
+    public partial class LoginUI : UIRoot {
         
         private Grid e_0;
         
@@ -39,12 +39,12 @@ namespace EmptyKeys.UserInterface.Generated {
         
         private Button btnConnection;
         
-        public BasicUI() : 
+        public LoginUI() : 
                 base() {
             this.Initialize();
         }
         
-        public BasicUI(int width, int height) : 
+        public LoginUI(int width, int height) : 
                 base(width, height) {
             this.Initialize();
         }

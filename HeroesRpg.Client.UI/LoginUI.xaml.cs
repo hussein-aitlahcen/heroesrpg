@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EmptyKeys.UserInterface.Designer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +18,9 @@ namespace HeroesRpg.Client.UI
     /// <summary>
     /// Interaction logic for BasicUI.xaml
     /// </summary>
-    public partial class BasicUI : Window
+    public partial class LoginUI : UIRoot
     {
-        public BasicUI()
+        public LoginUI()
         {
         }
     }

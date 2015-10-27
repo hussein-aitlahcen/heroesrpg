@@ -10,8 +10,49 @@ namespace HeroesRpg.Client.Game.World.Entity
     /// <summary>
     /// 
     /// </summary>
-    public abstract class MovableEntity : GameObject
+    public abstract class MovableEntity : DecoratedEntity
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public const int MOVEMENT_FORCE_X = 50;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int MovementX
+        {
+            get
+            {
+                return m_movementX;
+            }
+            set
+            {
+                m_movementX = value;
+                Move();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int MovementY
+        {
+            get
+            {
+                return m_movementY;
+            }
+            set
+            {
+                m_movementY = value;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private int m_movementX, m_movementY;
+
         /// <summary>
         /// 
         /// </summary>
@@ -21,13 +62,122 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="velocity"></param>
-        public void ApplyLinearVelocity(b2Vec2 velocity)
+        /// <param name="force"></param>
+        public void ApplyForceToCencer(b2Vec2 force)
         {
             if(PhysicsBody != null)
             {
-                PhysicsBody.LinearVelocity = velocity;
+                PhysicsBody.ApplyForceToCenter(force);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="impulse"></param>
+        public void ApplyLinearImpulseToCenter(b2Vec2 impulse)
+        {
+            if (PhysicsBody != null)
+            {
+                PhysicsBody.ApplyLinearImpulse(impulse, PhysicsBody.WorldCenter);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ResetVelocityX()
+        {
+            if(PhysicsBody != null)
+            {
+                PhysicsBody.LinearVelocity = new b2Vec2(0, PhysicsBody.LinearVelocity.y);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void Stand()
+        {
+            ResetVelocityX();
+            OnStand();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="left"></param>
+        public virtual void Move()
+        {
+            if (MovementX != 0)
+            {
+                FlipX = MovementX < 0;
+                ResetVelocityX();
+                ApplyLinearImpulseToCenter(GetMovementVelocity());
+                OnMove();
+            }
+            else
+            {
+                Stand();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual void Fly()
+        {
+            if(MovementY != 0)
+            {
+                if (MovementY > 0)
+                    OnFlyDown();
+                else
+                    OnFlyUp();
+            }
+            else
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void OnStand()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void OnMove()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void OnFlyUp()
+        {
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void OnFlyDown()
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public virtual b2Vec2 GetMovementVelocity()
+        {
+            return new b2Vec2(MOVEMENT_FORCE_X * MovementX, 0);
         }
 
         public override void Update(float dt)

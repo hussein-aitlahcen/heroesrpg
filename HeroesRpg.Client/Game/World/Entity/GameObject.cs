@@ -18,7 +18,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        const int PTM_RATIO = 32;
+        public const int PTM_RATIO = 32;
 
         /// <summary>
         /// 
@@ -50,12 +50,21 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public bool FixedRotation
+        public int PtmRatio
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool FixedRotation
+        {
+            get;
+            private set;
+        }
+        
         /// <summary>
         /// 
         /// </summary>
@@ -65,6 +74,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             Id = id;
             BodyType = physicsBodyType;
             FixedRotation = fixedRotation;
+            AnchorPoint = CCPoint.AnchorLowerLeft;
             
             Schedule(Update);     
         }
@@ -73,7 +83,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract b2Shape CreatePhysicsShape(int ptm);
+        public abstract b2Shape CreatePhysicsShape();
 
         /// <summary>
         /// 
@@ -81,15 +91,18 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="world"></param>
         public void CreatePhysicsBody(b2World world, int ptm)
         {
+            PtmRatio = ptm;
+
             var def = new b2BodyDef();
-            def.position = new b2Vec2(PositionX / ptm, PositionY / ptm);
+            def.position = new b2Vec2(PositionX / PtmRatio, PositionY / PtmRatio);
             def.type = BodyType;
             def.fixedRotation = FixedRotation;
-
-            var body = world.CreateBody(def);
             
+            var body = world.CreateBody(def);
+            body.Mass = 1f;
+
             var fd = new b2FixtureDef();
-            fd.shape = CreatePhysicsShape(ptm);
+            fd.shape = CreatePhysicsShape();
             fd.density = 1f;
 
             body.CreateFixture(fd);
@@ -107,8 +120,8 @@ namespace HeroesRpg.Client.Game.World.Entity
 
             if(PhysicsBody != null)
             {
-                PositionX = PhysicsBody.Position.x * PTM_RATIO;
-                PositionY = PhysicsBody.Position.y * PTM_RATIO;
+                PositionX = PhysicsBody.Position.x * PtmRatio;
+                PositionY = PhysicsBody.Position.y * PtmRatio;
             }
         }
     }
