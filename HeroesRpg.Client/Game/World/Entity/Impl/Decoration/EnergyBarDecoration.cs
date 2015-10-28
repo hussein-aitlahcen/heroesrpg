@@ -17,8 +17,8 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
         /// 
         /// </summary>
         /// <param name="type"></param>
-        public EnergyBarDecoration(DecorationTypeEnum type, int currentEnergy, int maxEnergy, float width, float height, CCColor4B background, CCColor4B foreground)
-            : base(type, new EnergyBar(currentEnergy, maxEnergy, width, height, background, foreground))
+        public EnergyBarDecoration(DecorationTypeEnum type, int currentEnergy, int maxEnergy, float width, float height, CCColor4B background, CCColor4B foreground, CCColor4B textColor)
+            : base(type, new EnergyBar(currentEnergy, maxEnergy, width, height, background, foreground, textColor))
         {
         }
     }

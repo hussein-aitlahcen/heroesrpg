@@ -56,6 +56,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             MaxLife = 100;
             CurrentLife = 50;
             AddDecoration(new CurrentLifeDecoration(CurrentLife, MaxLife));
+            AddDecoration(new CurrentLifeDecoration(200, 300));
         }
     }
 }

@@ -45,7 +45,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// </summary>
         public GameMapLayer()
         {
-            Color = CCColor3B.Gray;
+            Color = CCColor3B.White;
 
             Floor = new CCDrawNode();
             

@@ -19,7 +19,7 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
         /// <param name="currentLife"></param>
         /// <param name="maxLife"></param>
         public CurrentLifeDecoration(int currentLife, int maxLife)
-            : base(DecorationTypeEnum.LIFE, currentLife, maxLife, 50, 8, CCColor4B.Blue, CCColor4B.Green)
+            : base(DecorationTypeEnum.LIFE, currentLife, maxLife, 50, 8, CCColor4B.Blue, CCColor4B.Green, CCColor4B.Black)
         {
         }
     }

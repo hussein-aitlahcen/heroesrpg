@@ -23,7 +23,17 @@ namespace HeroesRpg.Client.Game.Graphic.Element
         /// <param name="message"></param>
         /// <param name="size"></param>
         /// <param name="color"></param>
-        public Label(string message, CCColor3B color) : base(message, FONT, 15, CCLabelFormat.SpriteFont)
+        public Label(string message, CCColor3B color) : this(message, FONT, 15, color)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="size"></param>
+        /// <param name="color"></param>
+        public Label(string message, string font, int size, CCColor3B color) : base(message, FONT, 15, CCLabelFormat.SpriteFont)
         {
             Color = color;
             AnchorPoint = CCPoint.AnchorUpperLeft;

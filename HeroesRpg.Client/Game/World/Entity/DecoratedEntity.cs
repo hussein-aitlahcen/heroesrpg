@@ -16,7 +16,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public const float MARGIN = 8f, BASE_MARGIN = 10f;
+        public const float MARGIN = 6f, BASE_MARGIN = 20f;
 
         /// <summary>
         /// 

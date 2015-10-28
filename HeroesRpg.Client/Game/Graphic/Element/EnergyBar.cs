@@ -30,20 +30,32 @@ namespace HeroesRpg.Client.Game.Graphic.Element
         public float MidHeight { get { return Height / 2; } }
         public CCColor4B Foreground { get; set; }
         public CCColor4B Background { get; set; }
+        public CCColor4B TextColor { get; set; }
 
         private CCDrawNode ForegroundNode;
-        
-        public EnergyBar(int currentEnergy, int maxEnergy, float width, float height, CCColor4B bg, CCColor4B fg)
+        private Label Text { get; set; }
+
+        public EnergyBar(int currentEnergy, int maxEnergy, float width, float height, CCColor4B bg, CCColor4B fg, CCColor4B textColor)
         {
+
             CurrentEnergy = currentEnergy;
             MaxEnergy = maxEnergy;
             ForegroundNode = new CCDrawNode();
             Background = bg;
             Foreground = fg;
+            TextColor = textColor;
             Width = width;
             Height = height;
 
             AddChild(ForegroundNode);
+
+            Text = new Label($"{CurrentEnergy}/{MaxEnergy}", new CCColor3B(TextColor));
+            Text.PositionX = PositionX + MidWidth;
+            Text.PositionY = PositionY + MidHeight + 1;
+            Text.AnchorPoint = CCPoint.AnchorMiddle; 
+            Text.Scale = 0.55f;
+
+            AddChild(Text);
 
             Draw();       
         }
@@ -51,7 +63,16 @@ namespace HeroesRpg.Client.Game.Graphic.Element
         protected void Draw()
         {
             Clear();
-            DrawRect(new CCRect(PositionX - 2, PositionY - 2, Width + 4, Height + 4), Background);
+
+            DrawRect(new CCRect(PositionX - 2, PositionY - 2, Width + 4, Height + 4), CCColor4B.LightGray, 0.5f, Background);
+            //DrawLine(new CCPoint(PositionX - 2, PositionY - 2), new CCPoint(PositionX + Width + 2, PositionY - 2), Background);
+            //DrawLine(new CCPoint(PositionX - 2, PositionY + Height + 2), new CCPoint(PositionX + Width + 2, PositionY + Height + 2), Background);
+
+            //DrawLine(new CCPoint(PositionX - 2, PositionY - 2), new CCPoint(PositionX - 2, PositionY + Height + 2), Background);
+            //DrawLine(new CCPoint(PositionX + Width + 2, PositionY - 2), new CCPoint(PositionX + Width + 2, PositionY + Height + 2), Background);
+
+
+            //DrawString((int)(PositionX + MidWidth), (int)(PositionY + MidHeight), $"{CurrentEnergy}/{MaxEnergy}");
             DrawRect(new CCRect(0, 0, Width * Ratio, Height), Foreground);
         }
     }
