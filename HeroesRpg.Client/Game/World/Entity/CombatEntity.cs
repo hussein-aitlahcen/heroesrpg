@@ -22,25 +22,25 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public int CurrentLife
+        public float CurrentLife
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public int MaxLife
+        public float MaxLife
         {
             get;
-            set;
+            private set;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public NameDecoration LifeDecoration
+        public CurrentLifeDecoration LifeDecoration
         {
             get;
             private set;
@@ -54,9 +54,29 @@ namespace HeroesRpg.Client.Game.World.Entity
         public CombatEntity(int id) : base(id)
         {
             MaxLife = 100;
-            CurrentLife = 50;
-            AddDecoration(new CurrentLifeDecoration(CurrentLife, MaxLife));
-            AddDecoration(new CurrentLifeDecoration(200, 300));
+            CurrentLife = 150;
+            AddDecoration(LifeDecoration = new CurrentLifeDecoration(() => CurrentLife, () => MaxLife));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dt"></param>
+        public override void Update(float dt)
+        {
+            base.Update(dt);
+
+            SetLife(CurrentLife * 0.99f);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="life"></param>
+        public void SetLife(float life)
+        {
+            CurrentLife = life;
+            LifeDecoration.Update();
         }
     }
 }

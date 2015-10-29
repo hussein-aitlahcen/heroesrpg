@@ -21,6 +21,8 @@ namespace HeroesRpg.Client.Game.World.Entity
     /// </summary>
     public interface IEntityDecoration
     {
+        float TopMargin { get; }
+        float BottomMargin { get; }
         int DecorationType { get; }
         CCNode Node { get; }
         CCSize GetContentSize();
@@ -49,12 +51,22 @@ namespace HeroesRpg.Client.Game.World.Entity
             get;
             private set;
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract float TopMargin { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract float BottomMargin { get; }
 
         /// <summary>
         /// 
         /// </summary>
         CCNode IEntityDecoration.Node => Node;
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -66,6 +78,13 @@ namespace HeroesRpg.Client.Game.World.Entity
             Node.AnchorPoint = CCPoint.AnchorMiddle;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void Update()
+        {
+        }
+        
         /// <summary>
         /// 
         /// </summary>

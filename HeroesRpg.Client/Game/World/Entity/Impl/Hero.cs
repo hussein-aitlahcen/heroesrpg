@@ -87,7 +87,7 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(ScaledContentSize.Width / PtmRatio, ScaledContentSize.Height / PtmRatio);
+            shape.SetAsBox(ScaledContentSize.Width / 2 / PtmRatio, ScaledContentSize.Height / 2 / PtmRatio);
             return shape;
         }
     }

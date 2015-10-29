@@ -15,7 +15,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public const int MOVEMENT_FORCE_X = 50;
+        public const float MOVEMENT_FORCE_X = 18f;
 
         /// <summary>
         /// 
@@ -184,10 +184,17 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             base.Update(dt);
 
-            if (PhysicsBody != null)
+            if (MovementX != 0)
             {
-            //    b2Vec2 forceA = new b2Vec2(0, -PhysicsBody.Mass * PhysicsBody.World.Gravity.y);
-            //    PhysicsBody.ApplyForce(forceA, PhysicsBody.WorldCenter);
+                if (PhysicsBody != null)
+                {
+                    // Reset friction decay for the movement velocity
+                    ResetVelocityX();
+                    ApplyLinearImpulseToCenter(GetMovementVelocity());
+
+                    //    b2Vec2 forceA = new b2Vec2(0, -PhysicsBody.Mass * PhysicsBody.World.Gravity.y);
+                    //    PhysicsBody.ApplyForce(forceA, PhysicsBody.WorldCenter);
+                }
             }
         }
     }

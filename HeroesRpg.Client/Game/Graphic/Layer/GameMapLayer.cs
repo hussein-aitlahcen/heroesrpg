@@ -62,7 +62,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             InitPhysics();
 
             Floor.AnchorPoint = CCPoint.AnchorLowerLeft;
-            Floor.DrawRect(new CCRect(0, 0, LayerSizeInPixels.Width, 60), CCColor4B.LightGray);
+            Floor.DrawRect(new CCRect(0, 0, LayerSizeInPixels.Width, 65), CCColor4B.LightGray);
 
             AddChild(Floor);
         }
@@ -79,17 +79,16 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             World = new b2World(gravity);
 
             var def = new b2BodyDef();
-            def.position = new b2Vec2(0, -1);
+            def.position = new b2Vec2(0, 0);
             def.type = b2BodyType.b2_staticBody;
 
             var groundBody = World.CreateBody(def);
 
             var groundBox = new b2PolygonShape();
-            groundBox.SetAsBox(s.Width, 0 / PTM_RATIO);
+            groundBox.SetAsBox(s.Width / PTM_RATIO, 60 / PTM_RATIO);
             
             var fd = new b2FixtureDef();
             fd.shape = groundBox;
-            fd.friction = 0f;
 
             groundBody.CreateFixture(fd);
         }
@@ -111,7 +110,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         public override void Update(float dt)
         {
             base.Update(dt);
-
+            
             World.Step(dt, 8, 4);
         }
     }

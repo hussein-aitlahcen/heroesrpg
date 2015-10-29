@@ -16,6 +16,28 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
         /// <summary>
         /// 
         /// </summary>
+        public override float BottomMargin
+        {
+            get
+            {
+                return 5f;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override float TopMargin
+        {
+            get
+            {
+                return 5f;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="name"></param>
         /// <param name="color"></param>
         /// <param name="scale"></param>

@@ -16,11 +16,51 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
         /// <summary>
         /// 
         /// </summary>
+        public override float BottomMargin
+        {
+            get
+            {
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override float TopMargin
+        {
+            get
+            {
+                return 5f;
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="currentLife"></param>
         /// <param name="maxLife"></param>
-        public CurrentLifeDecoration(int currentLife, int maxLife)
-            : base(DecorationTypeEnum.LIFE, currentLife, maxLife, 50, 8, CCColor4B.Blue, CCColor4B.Green, CCColor4B.Black)
+        public CurrentLifeDecoration(Func<float> currentLife, Func<float> maxLife)
+            : base(DecorationTypeEnum.LIFE, currentLife, maxLife, 50, 8, CCColor4B.Gray, CCColor4B.Green, CCColor4B.Black)
         {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Update()
+        {
+            if (Node.Ratio < 0.25f)
+            {
+                ForegroundColor = CCColor4B.Red;
+                TextColor = CCColor4B.White;
+            }
+            else if(Node.Ratio < 0.50f)
+            {
+                ForegroundColor = CCColor4B.Orange;
+                TextColor = CCColor4B.White;
+            }
+            base.Update();
         }
     }
 }

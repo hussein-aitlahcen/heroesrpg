@@ -16,7 +16,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public const float MARGIN = 6f, BASE_MARGIN = 20f;
+        public const float BASE_MARGIN = 20f;
 
         /// <summary>
         /// 
@@ -69,8 +69,10 @@ namespace HeroesRpg.Client.Game.World.Entity
             var currentHeight = size.Height + BASE_MARGIN;
             foreach (var decoration in m_decoration.OrderByDescending(deco => deco.DecorationType))
             {
+                currentHeight += decoration.BottomMargin;
                 decoration.Node.Position = new CCPoint(size.Width / 2, currentHeight);
-                currentHeight += decoration.GetContentSize().Height + MARGIN;
+                currentHeight += decoration.GetContentSize().Height;
+                currentHeight += decoration.TopMargin;
             }
         }
     }

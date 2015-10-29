@@ -21,50 +21,85 @@ namespace HeroesRpg.Client.Game.Graphic.Element
     {
         public const float UPDATE_INTERVAL = 0.05f;
 
-        public int CurrentEnergy { get; private set; }  
-        public int MaxEnergy { get; private set; }      
-        public float Ratio { get { return CurrentEnergy / (float)Math.Max(1, MaxEnergy); } }
+        public Func<float> CurrentEnergy { get; private set; }  
+        public Func<float> MaxEnergy { get; private set; }      
+        public float Ratio { get { return CurrentEnergy() / Math.Max(1, MaxEnergy()); } }
         public float Width { get; set; }
         public float Height { get; set; }   
         public float MidWidth { get { return Width / 2; } }
         public float MidHeight { get { return Height / 2; } }
-        public CCColor4B Foreground { get; set; }
-        public CCColor4B Background { get; set; }
-        public CCColor4B TextColor { get; set; }
+        public Func<CCColor4B> Foreground { get; private set; }
+        public Func<CCColor4B> Background { get; private set; }
+        public Func<CCColor4B> TextColor { get; private set; }
 
-        private CCDrawNode ForegroundNode;
-        private Label Text { get; set; }
+        private Label TextLabel { get; set; }
 
-        public EnergyBar(int currentEnergy, int maxEnergy, float width, float height, CCColor4B bg, CCColor4B fg, CCColor4B textColor)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentEnergy"></param>
+        /// <param name="maxEnergy"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="bg"></param>
+        /// <param name="fg"></param>
+        /// <param name="textColor"></param>
+        public EnergyBar(float width, float height, Func<float> currentEnergy, Func<float> maxEnergy, Func<CCColor4B> bg, Func<CCColor4B> fg, Func<CCColor4B> textColor)
+            : this(width, height)
         {
+            Initialize(currentEnergy, maxEnergy, bg, fg, textColor); 
+        }
 
-            CurrentEnergy = currentEnergy;
-            MaxEnergy = maxEnergy;
-            ForegroundNode = new CCDrawNode();
-            Background = bg;
-            Foreground = fg;
-            TextColor = textColor;
+        /// <summary>
+        /// 
+        /// </summary>
+        public EnergyBar(float width, float height)
+        {
             Width = width;
             Height = height;
 
-            AddChild(ForegroundNode);
+            TextLabel = new Label("?/?", CCColor3B.White);
+            TextLabel.PositionX = PositionX + MidWidth;
+            TextLabel.PositionY = PositionY + MidHeight + 0.5f;
+            TextLabel.AnchorPoint = CCPoint.AnchorMiddle;
+            TextLabel.Scale = 0.50f;
 
-            Text = new Label($"{CurrentEnergy}/{MaxEnergy}", new CCColor3B(TextColor));
-            Text.PositionX = PositionX + MidWidth;
-            Text.PositionY = PositionY + MidHeight + 1;
-            Text.AnchorPoint = CCPoint.AnchorMiddle; 
-            Text.Scale = 0.55f;
-
-            AddChild(Text);
-
-            Draw();       
+            AddChild(TextLabel);            
         }
 
-        protected void Draw()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currentEnergy"></param>
+        /// <param name="maxEnergy"></param>
+        /// <param name="bg"></param>
+        /// <param name="fg"></param>
+        /// <param name="textColor"></param>
+        public void Initialize(Func<float> currentEnergy, Func<float> maxEnergy, Func<CCColor4B> bg, Func<CCColor4B> fg, Func<CCColor4B> textColor)
         {
-            Clear();
+            CurrentEnergy = currentEnergy;
+            MaxEnergy = maxEnergy;
+            Background = bg;
+            Foreground = fg;
+            TextColor = textColor;
 
-            DrawRect(new CCRect(PositionX - 2, PositionY - 2, Width + 4, Height + 4), CCColor4B.LightGray, 0.5f, Background);
+            Redraw();
+        }
+
+        public void Redraw()
+        {
+            Cleanup();
+
+            var txtColor = TextColor();
+            var bgColor = Background();
+            var fgColor = Foreground();
+
+            TextLabel.Color = new CCColor3B(txtColor);
+            TextLabel.Text = $"{Math.Round(CurrentEnergy(), 1)}/{MaxEnergy()}";
+
+            const float padding = 1.5f;
+            const float doblepadding = 2 * padding;
+            DrawRect(new CCRect(-padding, -padding, Width + doblepadding, Height + doblepadding), bgColor, 0.5f, CCColor4B.Blue);
             //DrawLine(new CCPoint(PositionX - 2, PositionY - 2), new CCPoint(PositionX + Width + 2, PositionY - 2), Background);
             //DrawLine(new CCPoint(PositionX - 2, PositionY + Height + 2), new CCPoint(PositionX + Width + 2, PositionY + Height + 2), Background);
 
@@ -73,7 +108,7 @@ namespace HeroesRpg.Client.Game.Graphic.Element
 
 
             //DrawString((int)(PositionX + MidWidth), (int)(PositionY + MidHeight), $"{CurrentEnergy}/{MaxEnergy}");
-            DrawRect(new CCRect(0, 0, Width * Ratio, Height), Foreground);
+            DrawRect(new CCRect(0, 0, Width * Math.Min(1, Ratio), Height), fgColor);
         }
     }
 }
