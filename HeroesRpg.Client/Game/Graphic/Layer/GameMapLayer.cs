@@ -83,6 +83,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             
             var fd = new b2FixtureDef();
             fd.shape = groundBox;
+            fd.friction = 1f;
 
             groundBody.CreateFixture(fd);
         }

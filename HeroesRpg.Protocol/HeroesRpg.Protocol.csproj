@@ -57,6 +57,14 @@
     <Compile Include="Impl\Connection\Server\ClientVersionRequired.cs" />
     <Compile Include="Impl\Connection\Server\IdentificationResultMessage.cs" />
     <Compile Include="Impl\Connection\Server\WelcomeConnectMessage.cs" />
+    <Compile Include="Impl\Selection\Client\CharacterCreationMessage.cs" />
+    <Compile Include="Impl\Selection\Client\CharacterDeletionMessage.cs" />
+    <Compile Include="Impl\Selection\Client\CharacterSelectionMessage.cs" />
+    <Compile Include="Impl\Selection\Client\CharactersListRequestMessage.cs" />
+    <Compile Include="Impl\Selection\Server\CharacterCreationResultMessage.cs" />
+    <Compile Include="Impl\Selection\Server\CharacterDeletionResultMessage.cs" />
+    <Compile Include="Impl\Selection\Server\CharacterSelectionResultMessage.cs" />
+    <Compile Include="Impl\Selection\Server\CharactersListMessage.cs" />
     <Compile Include="NetMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -68,6 +76,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Impl\Game\Creation\" />
+    <Folder Include="Impl\Game\Map\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

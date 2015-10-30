@@ -104,6 +104,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             var fd = new b2FixtureDef();
             fd.shape = CreatePhysicsShape();
             fd.density = 1f;
+            fd.friction = 0.4f;
 
             body.CreateFixture(fd);
 
