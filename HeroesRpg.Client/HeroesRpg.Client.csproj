@@ -78,7 +78,6 @@
     <Compile Include="Game\Graphic\Scene\WrappedScene.cs" />
     <Compile Include="Game\Sound\SoundPlayer.cs" />
     <Compile Include="Game\Util\InputHelper.cs" />
-    <Compile Include="Game\World\Engine\ActorEngine.cs" />
     <Compile Include="Game\World\Entity\AnimatedEntity.cs" />
     <Compile Include="Game\World\Entity\DecoratedEntity.cs" />
     <Compile Include="Game\World\Entity\Impl\Animated\Animation.cs" />
@@ -94,12 +93,15 @@
     <Compile Include="Game\World\Entity\MovableEntity.cs" />
     <Compile Include="Game\World\Entity\EntityDecoration.cs" />
     <Compile Include="Game\World\Entity\StaticEntity.cs" />
+    <Compile Include="Game\World\WorldManager.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Manager\ManagerEnum.cs" />
     <Compile Include="Manager\SpriteManager.cs" />
     <Compile Include="Data\Actor\ActorData.cs" />
     <Compile Include="Data\Actor\HeroData.cs" />
     <Compile Include="Manager\ActorManager.cs" />
+    <Compile Include="Network\GameClient.cs" />
+    <Compile Include="Network\IGameFrame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data\Texture\SpriteSheetCache.cs" />
@@ -225,6 +227,14 @@
       <Project>{81729959-e23c-4113-a0c8-ee5bcac427f2}</Project>
       <Name>HeroesRpg.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\HeroesRpg.Network\HeroesRpg.Network.csproj">
+      <Project>{cf1139de-98e3-4317-8761-153ee9fe7cc0}</Project>
+      <Name>HeroesRpg.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HeroesRpg.Protocol\HeroesRpg.Protocol.csproj">
+      <Project>{42a6105c-7b8a-4e89-82b7-986ead2ca3f6}</Project>
+      <Name>HeroesRpg.Protocol</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
@@ -238,6 +248,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

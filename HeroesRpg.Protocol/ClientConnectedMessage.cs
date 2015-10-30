@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HeroesRpg.Client.Game.World.Engine
+namespace HeroesRpg.Protocol
 {
-    public sealed class ActorEngine
+    public sealed class ClientConnectedMessage : NetMessage
     {
-
     }
 }

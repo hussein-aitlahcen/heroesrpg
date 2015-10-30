@@ -8,6 +8,7 @@ using HeroesRpg.Client.Game.Graphic;
 using EmptyKeys.UserInterface;
 using Microsoft.Xna.Framework.Graphics;
 using EmptyKeys.UserInterface.Themes;
+using HeroesRpg.Client.Network;
 
 namespace HeroesRpg.Client
 {
@@ -51,11 +52,14 @@ namespace HeroesRpg.Client
             //    CCSprite.DefaultTexelToContentSizeRatio = 1.0f;
             //}
 
+            // Poll incomming messages
+            SharedApplication.Scheduler.Schedule(GameClient.Instance, 0, false);
+
             ResourceDictionary.DefaultDictionary = Light.GetThemeDictionary();
             SpriteFont font = CCContentManager.SharedContentManager.Load<SpriteFont>("fonts/Segoe_UI_10_Regular");
             FontManager.DefaultFont = Engine.Instance.Renderer.CreateFont(font);
             FontManager.Instance.LoadFonts(CCContentManager.SharedContentManager, "fonts");
-
+            
             SuperManager.Instance.InitializeManagers(typeof(Manager.ActorManager).Namespace);
             SceneLoader.Instance.LoadLoginScene();
         }

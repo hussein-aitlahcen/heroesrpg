@@ -46,7 +46,7 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
           
             Schedule(Update);
         }
-                        
+        
         /// <summary>
         /// 
         /// </summary>

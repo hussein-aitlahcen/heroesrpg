@@ -56,6 +56,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer.HUD
         {
             base.AddedToScene();
             Schedule(UpdateUI);
+            Schedule(Update);
         }
 
         /// <summary>

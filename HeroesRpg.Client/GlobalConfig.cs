@@ -13,5 +13,7 @@ namespace HeroesRpg.Client
     public sealed class GlobalConfig : Singleton<GlobalConfig>
     {
         public const int PTM_RATIO = 32;
+        public const string GAME_HOST = "localhost";
+        public const int GAME_PORT = 111;
     }
 }

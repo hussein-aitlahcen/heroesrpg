@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4260DFB1-127A-46C5-9BEA-7483B97CB17D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{42A6105C-7B8A-4E89-82B7-986EAD2CA3F6}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HeroesRpg.Server</RootNamespace>
-    <AssemblyName>HeroesRpg.Server</AssemblyName>
+    <RootNamespace>HeroesRpg.Protocol</RootNamespace>
+    <AssemblyName>HeroesRpg.Protocol</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,13 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -52,31 +51,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Network\GameClient.cs" />
-    <Compile Include="Network\NetworkAcceptor.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="ClientConnectedMessage.cs" />
+    <Compile Include="ClientDisconnectedMessage.cs" />
+    <Compile Include="Impl\Connection\Client\IdentificationMessage.cs" />
+    <Compile Include="Impl\Connection\Server\ClientVersionRequired.cs" />
+    <Compile Include="Impl\Connection\Server\IdentificationResultMessage.cs" />
+    <Compile Include="Impl\Connection\Server\WelcomeConnectMessage.cs" />
+    <Compile Include="NetMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HeroesRpg.Common\HeroesRpg.Common.csproj">
       <Project>{81729959-e23c-4113-a0c8-ee5bcac427f2}</Project>
       <Name>HeroesRpg.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\HeroesRpg.Network\HeroesRpg.Network.csproj">
-      <Project>{cf1139de-98e3-4317-8761-153ee9fe7cc0}</Project>
-      <Name>HeroesRpg.Network</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\HeroesRpg.Protocol\HeroesRpg.Protocol.csproj">
-      <Project>{42a6105c-7b8a-4e89-82b7-986ead2ca3f6}</Project>
-      <Name>HeroesRpg.Protocol</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Game\" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

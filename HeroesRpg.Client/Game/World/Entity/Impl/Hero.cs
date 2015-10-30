@@ -12,6 +12,9 @@ using HeroesRpg.Client.Game.World.Entity.Impl.Decoration;
 
 namespace HeroesRpg.Client.Game.World.Entity.Impl
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum HeroEnum
     {
         BROLY = 0,

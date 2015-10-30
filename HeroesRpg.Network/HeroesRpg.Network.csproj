@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4260DFB1-127A-46C5-9BEA-7483B97CB17D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{CF1139DE-98E3-4317-8761-153EE9FE7CC0}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HeroesRpg.Server</RootNamespace>
-    <AssemblyName>HeroesRpg.Server</AssemblyName>
+    <RootNamespace>HeroesRpg.Network</RootNamespace>
+    <AssemblyName>HeroesRpg.Network</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,13 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="ENet, Version=1.3.6.3, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ENet.1.3.6.3\lib\ENet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -52,31 +51,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Network\GameClient.cs" />
-    <Compile Include="Network\NetworkAcceptor.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="NetClient.cs" />
+    <Compile Include="NetServer.cs" />
+    <Compile Include="NetServerClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="libenet.dylib">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HeroesRpg.Common\HeroesRpg.Common.csproj">
-      <Project>{81729959-e23c-4113-a0c8-ee5bcac427f2}</Project>
-      <Name>HeroesRpg.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\HeroesRpg.Network\HeroesRpg.Network.csproj">
-      <Project>{cf1139de-98e3-4317-8761-153ee9fe7cc0}</Project>
-      <Name>HeroesRpg.Network</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\HeroesRpg.Protocol\HeroesRpg.Protocol.csproj">
-      <Project>{42a6105c-7b8a-4e89-82b7-986ead2ca3f6}</Project>
-      <Name>HeroesRpg.Protocol</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Game\" />
+    <None Include="ENetX64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ENetX86.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

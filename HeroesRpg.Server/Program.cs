@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HeroesRpg.Server.Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,9 @@ namespace HeroesRpg.Server
     {
         static void Main(string[] args)
         {
+            NetworkAcceptor.Instance.Initialize();
+
+            Console.ReadLine();
         }
     }
 }

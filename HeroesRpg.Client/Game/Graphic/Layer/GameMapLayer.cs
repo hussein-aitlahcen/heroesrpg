@@ -15,13 +15,8 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
     /// <summary>
     /// 
     /// </summary>
-    public sealed class GameMapLayer : WrappedLayer
+    public sealed class GameMapLayer : WrappedLayer, IDisposable
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public const int PTM_RATIO = 32;
-
         /// <summary>
         /// 
         /// </summary>
@@ -46,9 +41,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         public GameMapLayer()
         {
             Color = CCColor3B.White;
-
-            Floor = new CCDrawNode();
-            
+                        
             Schedule(Update);
         }
 
@@ -61,6 +54,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             
             InitPhysics();
 
+            Floor = new CCDrawNode();
             Floor.AnchorPoint = CCPoint.AnchorLowerLeft;
             Floor.DrawRect(new CCRect(0, 0, LayerSizeInPixels.Width, 65), CCColor4B.LightGray);
 
@@ -85,7 +79,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             var groundBody = World.CreateBody(def);
 
             var groundBox = new b2PolygonShape();
-            groundBox.SetAsBox(s.Width / PTM_RATIO, 60 / PTM_RATIO);
+            groundBox.SetAsBox(s.Width / GlobalConfig.PTM_RATIO, 60 / GlobalConfig.PTM_RATIO);
             
             var fd = new b2FixtureDef();
             fd.shape = groundBox;
@@ -99,8 +93,18 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// <param name="obj"></param>
         public void AddGameObject(GameObject obj)
         {
-            obj.CreatePhysicsBody(World, PTM_RATIO);
+            obj.CreatePhysicsBody(World, GlobalConfig.PTM_RATIO);
             AddChild(obj);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        public void RemoveGameObject(GameObject obj)
+        {
+            World.DestroyBody(obj.PhysicsBody);
+            RemoveChild(obj);
         }
 
         /// <summary>
@@ -109,8 +113,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// <param name="dt"></param>
         public override void Update(float dt)
         {
-            base.Update(dt);
-            
+            base.Update(dt);            
             World.Step(dt, 8, 4);
         }
     }
