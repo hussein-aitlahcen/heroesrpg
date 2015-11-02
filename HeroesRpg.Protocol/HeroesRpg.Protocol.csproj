@@ -53,10 +53,16 @@
   <ItemGroup>
     <Compile Include="ClientConnectedMessage.cs" />
     <Compile Include="ClientDisconnectedMessage.cs" />
+    <Compile Include="Enum\DragonBallHeroEnum.cs" />
+    <Compile Include="Enum\EntityTypeEnum.cs" />
+    <Compile Include="Enum\HeroTypeEnum.cs" />
     <Compile Include="Impl\Connection\Client\IdentificationMessage.cs" />
     <Compile Include="Impl\Connection\Server\ClientVersionRequired.cs" />
     <Compile Include="Impl\Connection\Server\IdentificationResultMessage.cs" />
     <Compile Include="Impl\Connection\Server\WelcomeConnectMessage.cs" />
+    <Compile Include="Impl\Game\Map\Client\PhysicsWorldDataRequestMessage.cs" />
+    <Compile Include="Impl\Game\Map\Server\EntitySpawMessage.cs" />
+    <Compile Include="Impl\Game\Map\Server\PhysicsWorldDataMessage.cs" />
     <Compile Include="Impl\Selection\Client\CharacterCreationMessage.cs" />
     <Compile Include="Impl\Selection\Client\CharacterDeletionMessage.cs" />
     <Compile Include="Impl\Selection\Client\CharacterSelectionMessage.cs" />
@@ -79,7 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Impl\Game\Creation\" />
-    <Folder Include="Impl\Game\Map\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,6 @@
-﻿using HeroesRpg.Server.Network;
+﻿using HeroesRpg.Server.Game;
+using HeroesRpg.Server.Network;
+using log4net.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,9 @@ namespace HeroesRpg.Server
     {
         static void Main(string[] args)
         {
-            NetworkAcceptor.Instance.Initialize();
+            XmlConfigurator.Configure();
+
+            GameSystem.Instance.Initialize();
 
             Console.ReadLine();
         }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace HeroesRpg.Client.Game.World.Entity
 {
@@ -51,7 +52,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
-        public CombatEntity(int id) : base(id)
+        public CombatEntity()
         {
             MaxLife = 100;
             CurrentLife = 150;
@@ -77,6 +78,25 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             CurrentLife = life;
             LifeDecoration.Update();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public override void FromNetwork(BinaryReader reader)
+        {
+            base.FromNetwork(reader);
+            UpdateCombatEntityPart(reader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public void UpdateCombatEntityPart(BinaryReader reader)
+        {
+
         }
     }
 }

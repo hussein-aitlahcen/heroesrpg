@@ -41,7 +41,7 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
         /// <param name="currentLife"></param>
         /// <param name="maxLife"></param>
         public CurrentLifeDecoration(Func<float> currentLife, Func<float> maxLife)
-            : base(DecorationTypeEnum.LIFE, currentLife, maxLife, 50, 8, CCColor4B.Gray, CCColor4B.Green, CCColor4B.Black)
+            : base(DecorationTypeEnum.LIFE, currentLife, maxLife, 50, 8, CCColor4B.LightGray, CCColor4B.Green, CCColor4B.Black)
         {
         }
 
@@ -53,12 +53,17 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
             if (Node.Ratio < 0.25f)
             {
                 ForegroundColor = CCColor4B.Red;
-                TextColor = CCColor4B.White;
+                TextColor = CCColor4B.Orange;
             }
             else if(Node.Ratio < 0.50f)
             {
                 ForegroundColor = CCColor4B.Orange;
-                TextColor = CCColor4B.White;
+                TextColor = CCColor4B.Magenta;
+            }
+            else
+            {
+                BackgroundColor = CCColor4B.Gray;
+                ForegroundColor = CCColor4B.Green;
             }
             base.Update();
         }

@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,10 +33,19 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Akka, Version=1.0.4.12, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Akka.1.0.4\lib\net45\Akka.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="box2d, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\box2d.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -52,6 +62,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Entity\AnimatedEntity.cs" />
+    <Compile Include="Game\Entity\CombatEntity.cs" />
+    <Compile Include="Game\Entity\GameObject.cs" />
+    <Compile Include="Game\Entity\Impl\DragonBallHero.cs" />
+    <Compile Include="Game\Entity\Impl\Hero.cs" />
+    <Compile Include="Game\Entity\MovableEntity.cs" />
+    <Compile Include="Game\Entity\StaticEntity.cs" />
+    <Compile Include="Game\GameSystem.cs" />
+    <Compile Include="Game\Handler\Impl\ConnectionHandler.cs" />
+    <Compile Include="Game\Handler\GameHandler.cs" />
+    <Compile Include="Game\Handler\ClientMessage.cs" />
+    <Compile Include="Game\Handler\Impl\MapHandler.cs" />
+    <Compile Include="Game\Map\MapInstance.cs" />
+    <Compile Include="Game\Map\MapManager.cs" />
+    <Compile Include="Game\Map\PhysicsWorldInstance.cs" />
+    <Compile Include="Game\MessageProcessor.cs" />
+    <Compile Include="Network\ClientManager.cs" />
     <Compile Include="Network\GameClient.cs" />
     <Compile Include="Network\NetworkAcceptor.cs" />
     <Compile Include="Program.cs" />
@@ -76,8 +103,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Game\" />
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libs\box2d.dll" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

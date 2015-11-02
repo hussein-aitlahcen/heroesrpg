@@ -22,7 +22,7 @@ namespace HeroesRpg.Client.Data.Actor
             switch(actorType)
             {
                 case HERO:
-                    return new HeroData(actorName, key);
+                    return new DragonBallHeroData(actorName, key);
 
                 default:
                     throw new UnknowActorTypeException($"actor type cannot be determined : {key}");

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace HeroesRpg.Client.Game.World.Entity
 {
@@ -50,28 +51,10 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// 
         /// </summary>
         /// <param name="id"></param>
-        public AnimatedEntity(int id) : base(id)
+        public AnimatedEntity()
         {
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public override void OnStand()
-        {
-            base.OnStand();
-            StartAnimation(Animation.STAND);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public override void OnMove()
-        {
-            base.OnMove();
-            StartAnimation(Animation.WALK);
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -84,7 +67,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             
             var animationFrames = GetAnimationSprites(animation.RawSprite);
             SpriteFrame = animationFrames.First();
-
+                        
             if (AnimationAction != null)
                 StopAction(AnimationAction.Tag);
             AnimationAction = new CCAnimate(new CCAnimation(animationFrames, animation.SpriteDelay));
@@ -121,6 +104,25 @@ namespace HeroesRpg.Client.Game.World.Entity
         public virtual void OnFrameChanged()
         {
             ComputeDecorationPositions();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public override void FromNetwork(BinaryReader reader)
+        {
+            base.FromNetwork(reader);
+            UpdateAnimatedEntityData(reader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public void UpdateAnimatedEntityData(BinaryReader reader)
+        {
+
         }
     }
 }

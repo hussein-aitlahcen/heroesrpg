@@ -4,6 +4,7 @@ using Box2D.Dynamics;
 using CocosSharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,11 +16,6 @@ namespace HeroesRpg.Client.Game.World.Entity
     /// </summary>
     public abstract class GameObject : CCSprite
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public const int PTM_RATIO = 32;
-
         /// <summary>
         /// 
         /// </summary>
@@ -37,11 +33,29 @@ namespace HeroesRpg.Client.Game.World.Entity
             get;
             private set;
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public b2BodyDef PhysicsBodyDef
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public b2BodyType BodyType
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public b2FixtureDef PhysicsBodyFixture
         {
             get;
             private set;
@@ -59,24 +73,63 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        public float Mass
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float Density
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float Friction
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool FixedRotation
         {
             get;
             private set;
         }
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public b2Vec2 PhysicsPosition
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="id"></param>
-        public GameObject(int id, b2BodyType physicsBodyType, bool fixedRotation = true)
+        public GameObject(b2BodyType physicsBodyType)
         {
-            Id = id;
             BodyType = physicsBodyType;
-            FixedRotation = fixedRotation;
             AnchorPoint = CCPoint.AnchorLowerLeft;
-            
-            Schedule(Update);     
+            PhysicsPosition = new b2Vec2(0, 0);
+
+            Mass = 1f;
+            Density = 1f;
+            Friction = 0.4f;
+
+            Schedule(Update);
         }
 
         /// <summary>
@@ -93,23 +146,38 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             PtmRatio = ptm;
 
-            var def = new b2BodyDef();
-            def.position = new b2Vec2(PositionX / PtmRatio, PositionY / PtmRatio);
-            def.type = BodyType;
-            def.fixedRotation = FixedRotation;
-            
-            var body = world.CreateBody(def);
-            body.Mass = 1f;
+            PhysicsBodyDef = new b2BodyDef();
+            PhysicsBodyDef.position = PhysicsPosition;
+            PhysicsBodyDef.type = BodyType;
+            PhysicsBodyDef.fixedRotation = FixedRotation;
 
-            var fd = new b2FixtureDef();
-            fd.shape = CreatePhysicsShape();
-            fd.density = 1f;
-            fd.friction = 0.4f;
+            PhysicsBody = world.CreateBody(PhysicsBodyDef);
+            PhysicsBody.Mass = Mass;
 
-            body.CreateFixture(fd);
+            PhysicsBodyFixture = new b2FixtureDef();
+            PhysicsBodyFixture.shape = CreatePhysicsShape();
+            PhysicsBodyFixture.density = Density;
+            PhysicsBodyFixture.friction = Friction;
 
-            PhysicsBody = body;
+            PositionX = GetMeterToPoint(PhysicsPosition.x);
+            PositionY = GetMeterToPoint(PhysicsPosition.y);
+
+            PhysicsBody.CreateFixture(PhysicsBodyFixture);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public float GetPointToMeter(float value) => value / PtmRatio;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public float GetMeterToPoint(float value) => value * PtmRatio;
 
         /// <summary>
         /// 
@@ -118,12 +186,47 @@ namespace HeroesRpg.Client.Game.World.Entity
         public override void Update(float dt)
         {
             base.Update(dt);
-
-            if(PhysicsBody != null)
+            if (PhysicsBody != null)
             {
-                PositionX = PhysicsBody.Position.x * PtmRatio;
-                PositionY = PhysicsBody.Position.y * PtmRatio;
+                PositionX = GetMeterToPoint(PhysicsBody.Position.x);
+                PositionY = GetMeterToPoint(PhysicsBody.Position.y);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public virtual void FromNetwork(BinaryReader reader)
+        {
+            UpdateGameObjectData(reader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public void UpdateGameObjectData(BinaryReader reader)
+        {
+            Id = reader.ReadInt32();
+            SetPhysicsPosition(reader.ReadSingle(), reader.ReadSingle());
+            Mass = reader.ReadSingle();
+            Density = reader.ReadSingle();
+            Friction = reader.ReadSingle();
+            FixedRotation = reader.ReadBoolean();
+        }
+
+        public void SetPhysicsPosition(float x, float y)
+        {
+            PhysicsPosition = new b2Vec2(x, y);
+            if(PhysicsBody != null)
+            {
+                PhysicsBody.SetTransform(PhysicsPosition, 0f);
+            }
+        }
+        public void SetMass(float mass) => Mass = mass;
+        public void SetDensity(float density) => Density = density;
+        public void SetFriction(float friction) => Friction = friction;
+        public void SetFixedRotation(bool fixedRotation) => PhysicsBodyDef.fixedRotation = fixedRotation; 
     }
 }

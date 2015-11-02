@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace HeroesRpg.Client.Game.World.Entity
 {
@@ -21,7 +22,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        private HashSet<IEntityDecoration> m_decoration;
+        private HashSet<IEntityDecoration> m_decorations;
 
         /// <summary>
         /// 
@@ -29,9 +30,22 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="id"></param>
         /// <param name="bodyType"></param>
         /// <param name="fixedRotation"></param>
-        public DecoratedEntity(int id, b2BodyType bodyType, bool fixedRotation = true) : base(id, bodyType, fixedRotation)
+        public DecoratedEntity(b2BodyType bodyType) : base(bodyType)
         {
-            m_decoration = new HashSet<IEntityDecoration>();
+            m_decorations = new HashSet<IEntityDecoration>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ClearDecoration()
+        {
+            foreach(var decoration in m_decorations)
+            {
+                RemoveChild(decoration.Node);
+                decoration.Node.Dispose();
+            }
+            m_decorations.Clear();
         }
 
         /// <summary>
@@ -40,7 +54,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="decoration"></param>
         public void AddDecoration(IEntityDecoration decoration)
         {
-            if (m_decoration.Add(decoration))
+            if (m_decorations.Add(decoration))
             {
                 AddChild(decoration.Node);
                 ComputeDecorationPositions();
@@ -53,7 +67,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="decoration"></param>
         public void RemoveDecoration(IEntityDecoration decoration)
         {
-            if (m_decoration.Remove(decoration))
+            if (m_decorations.Remove(decoration))
             {
                 RemoveChild(decoration.Node);
                 ComputeDecorationPositions();
@@ -67,13 +81,13 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             var size = ScaledContentSize;
             var currentHeight = size.Height + BASE_MARGIN;
-            foreach (var decoration in m_decoration.OrderByDescending(deco => deco.DecorationType))
+            foreach (var decoration in m_decorations.OrderByDescending(deco => deco.DecorationType))
             {
                 currentHeight += decoration.BottomMargin;
                 decoration.Node.Position = new CCPoint(size.Width / 2, currentHeight);
                 currentHeight += decoration.GetContentSize().Height;
                 currentHeight += decoration.TopMargin;
             }
-        }
+        }        
     }
 }

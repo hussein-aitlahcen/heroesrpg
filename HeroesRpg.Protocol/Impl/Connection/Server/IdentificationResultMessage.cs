@@ -14,14 +14,9 @@ namespace HeroesRpg.Protocol.Impl.Connection.Server
         BANNED,
     }
 
-    [ProtoContract]
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class IdentificationResultMessage : NetMessage
     {
-        [ProtoMember(1)]
-        public IdentificationResultEnum Code
-        {
-            get;
-            set;
-        }
+        public IdentificationResultEnum Code { get; set; }
     }
 }

@@ -34,16 +34,7 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
         public GameScene()
         {
             AddChild(MapLayer = new GameMapLayer());
-
-            m_hero = new Hero(0, 10, "Smarken") { Position = new CCPoint(VisibleBoundsScreenspace.MidX, 500) };
-            m_hero.StartAnimation(Animation.STAND);
-
-            var testObj = new Hero(0, 10, "Test") { Position = new CCPoint(VisibleBoundsScreenspace.MidX, 250) };
-            testObj.StartAnimation(Animation.STAND);
-
-            MapLayer.AddGameObject(testObj);
-            MapLayer.AddGameObject(m_hero);
-          
+                                  
             Schedule(Update);
         }
         
@@ -63,11 +54,9 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
                     break;
 
                 case CCKeys.Left:
-                    m_hero.MovementX--;
                     break;
 
                 case CCKeys.Right:
-                    m_hero.MovementX++;
                     break;
             }
         }
@@ -82,11 +71,9 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             switch (ev.Keys)
             {
                 case CCKeys.Left:
-                    m_hero.MovementX++;
                     break;
 
                 case CCKeys.Right:
-                    m_hero.MovementX--;
                     break;
             }
         }

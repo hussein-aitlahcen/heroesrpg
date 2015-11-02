@@ -7,20 +7,11 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg.Client.Game.Graphic.Element
 {
-    public enum lineTypes
-    {
-        LINE_TEMP = 1,
-        LINE_DASHED = 2,
-        LINE_NONE = 3
-    }
-
     /// <summary>
     /// 
     /// </summary>
     public class EnergyBar : CCDrawNode
     {
-        public const float UPDATE_INTERVAL = 0.05f;
-
         public Func<float> CurrentEnergy { get; private set; }  
         public Func<float> MaxEnergy { get; private set; }      
         public float Ratio { get { return CurrentEnergy() / Math.Max(1, MaxEnergy()); } }
@@ -86,8 +77,14 @@ namespace HeroesRpg.Client.Game.Graphic.Element
             Redraw();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void Redraw()
-        {
+        {           
+            const float padding = 1.5f;
+            const float doblepadding = 2 * padding;
+
             Cleanup();
 
             var txtColor = TextColor();
@@ -97,17 +94,7 @@ namespace HeroesRpg.Client.Game.Graphic.Element
             TextLabel.Color = new CCColor3B(txtColor);
             TextLabel.Text = $"{Math.Round(CurrentEnergy(), 1)}/{MaxEnergy()}";
 
-            const float padding = 1.5f;
-            const float doblepadding = 2 * padding;
             DrawRect(new CCRect(-padding, -padding, Width + doblepadding, Height + doblepadding), bgColor, 0.5f, CCColor4B.Blue);
-            //DrawLine(new CCPoint(PositionX - 2, PositionY - 2), new CCPoint(PositionX + Width + 2, PositionY - 2), Background);
-            //DrawLine(new CCPoint(PositionX - 2, PositionY + Height + 2), new CCPoint(PositionX + Width + 2, PositionY + Height + 2), Background);
-
-            //DrawLine(new CCPoint(PositionX - 2, PositionY - 2), new CCPoint(PositionX - 2, PositionY + Height + 2), Background);
-            //DrawLine(new CCPoint(PositionX + Width + 2, PositionY - 2), new CCPoint(PositionX + Width + 2, PositionY + Height + 2), Background);
-
-
-            //DrawString((int)(PositionX + MidWidth), (int)(PositionY + MidHeight), $"{CurrentEnergy}/{MaxEnergy}");
             DrawRect(new CCRect(0, 0, Width * Math.Min(1, Ratio), Height), fgColor);
         }
     }

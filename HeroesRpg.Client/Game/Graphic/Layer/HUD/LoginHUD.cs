@@ -43,6 +43,9 @@ namespace HeroesRpg.Client.Game.Graphic.Layer.HUD
             UI.InputBindings.Add(binding);
             TxtAccount.InputBindings.Add(binding);
             TxtPassword.InputBindings.Add(binding);
+
+            // register back to the client
+            GameClient.Instance.AddFrame(this);
         }
 
         /// <summary>
@@ -55,10 +58,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer.HUD
             // Reset ui because of the singleton
             TxtAccount.Text = string.Empty;
             TxtPassword.Password = string.Empty;
-
-            // register back to the client
-            GameClient.Instance.AddFrame(this);
-
+            
             ResetConnection();     
         }
 

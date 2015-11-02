@@ -2,6 +2,7 @@
 using HeroesRpg.Client.Game.Graphic.Element;
 using HeroesRpg.Client.Game.World.Entity.Impl;
 using HeroesRpg.Client.Game.World.Entity.Impl.Animated;
+using HeroesRpg.Protocol.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,10 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// </summary>
         public LoadingLayer()
         {
-            m_loadingHero = new Hero(0, 10, "Broly") { Position = new CCPoint(0, 15) };
+            m_loadingHero = new DragonBallHero() { Position = new CCPoint(0, 15) };
+            m_loadingHero.Position = new CCPoint(0, 15);
+            m_loadingHero.SetHeroId((int)DragonBallHeroEnum.BROLY);
+            m_loadingHero.SetPlayerName("Broly");
             m_loadingHero.Scale = 1.3f;
             m_loadingHero.StartAnimation(Animation.WALK);
             ZOrder = int.MaxValue;

@@ -20,6 +20,20 @@ namespace HeroesRpg.Network
         /// <summary>
         /// 
         /// </summary>
+        public unsafe uint UniqueID
+        {
+            get
+            {
+                if (m_peer != null)
+                    if (m_peer.IsInitialized)
+                        return m_peer.NativeData->connectID;
+                return uint.MaxValue;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="peer"></param>
         internal void Initialize(Peer peer)
         {

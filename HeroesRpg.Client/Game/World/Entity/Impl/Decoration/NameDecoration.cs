@@ -41,7 +41,7 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl.Decoration
         /// <param name="name"></param>
         /// <param name="color"></param>
         /// <param name="scale"></param>
-        public NameDecoration(string name, CCColor3B color) 
+        public NameDecoration(Func<string> name, Func<CCColor3B> color) 
             : base(DecorationTypeEnum.NAME,  name, color)
         {
         }
