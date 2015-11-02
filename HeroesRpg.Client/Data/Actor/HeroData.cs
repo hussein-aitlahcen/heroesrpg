@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg.Client.Data.Actor
 {
-    public sealed class HeroData : ActorData
+    public abstract class HeroData : ActorData
     {
-        public const string BROLY = "broly";
         public HeroData(string name, string fullName) : base(name, fullName)
         {
         }

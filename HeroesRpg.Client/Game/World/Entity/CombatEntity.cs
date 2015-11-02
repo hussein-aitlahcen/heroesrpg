@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using HeroesRpg.Protocol.Game.State.Part.Impl;
 
 namespace HeroesRpg.Client.Game.World.Entity
 {
@@ -51,22 +53,21 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// </summary>
         /// <param name="id"></param>
         /// <param name="name"></param>
-        public CombatEntity(int id) : base(id)
+        public CombatEntity()
         {
             MaxLife = 100;
             CurrentLife = 150;
             AddDecoration(LifeDecoration = new CurrentLifeDecoration(() => CurrentLife, () => MaxLife));
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="dt"></param>
-        public override void Update(float dt)
+        /// <param name="maxLife"></param>
+        public void SetMaxLife(float maxLife)
         {
-            base.Update(dt);
-
-            SetLife(CurrentLife * 0.99f);
+            MaxLife = maxLife;
+            LifeDecoration.Update();
         }
 
         /// <summary>
@@ -77,6 +78,36 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             CurrentLife = life;
             LifeDecoration.Update();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public override void FromNetwork(BinaryReader reader)
+        {
+            base.FromNetwork(reader);
+            UpdateCombatEntityNetwork(reader);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="reader"></param>
+        public void UpdateCombatEntityNetwork(BinaryReader reader)
+        {
+            MaxLife = reader.ReadInt32();
+            CurrentLife = reader.ReadInt32();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="part"></param>
+        public void UpdateCombatEntityPart(CombatEntityPart part)
+        {
+            SetMaxLife(part.MaxLife);
+            SetLife(part.CurrentLife);
         }
     }
 }

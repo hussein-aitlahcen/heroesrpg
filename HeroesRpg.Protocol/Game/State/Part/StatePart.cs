@@ -15,7 +15,8 @@ namespace HeroesRpg.Protocol.Game.State.Part
         GAME_OBJECT,
         MOVABLE_ENTITY,
         STATIC_ENTITY,
-        COMBAT_ENTITY
+        COMBAT_ENTITY,
+        HERO_ENTITY,
     }
 
     /// <summary>

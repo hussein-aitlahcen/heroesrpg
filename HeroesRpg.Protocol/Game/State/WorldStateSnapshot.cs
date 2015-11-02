@@ -1,5 +1,4 @@
-﻿using HeroesRpg.Protocol.Game.State.Impl;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,8 +10,28 @@ namespace HeroesRpg.Protocol.Game.State
     /// <summary>
     /// 
     /// </summary>
-    public sealed class GameStateSnapshot
+    public sealed class WorldStateSnapshot
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public double GameTime
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<ISerializableState> States
+        {
+            get
+            {
+                return m_states;
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -21,7 +40,16 @@ namespace HeroesRpg.Protocol.Game.State
         /// <summary>
         /// 
         /// </summary>
-        public GameStateSnapshot()
+        /// <param name="gameTime"></param>
+        public WorldStateSnapshot(double gameTime) : this()
+        {
+            GameTime = gameTime;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public WorldStateSnapshot()
         {
             m_states = new List<ISerializableState>();
         }
@@ -31,7 +59,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public GameStateSnapshot AddState(ISerializableState state)
+        public WorldStateSnapshot AddState(ISerializableState state)
         {
             m_states.Add(state);
             return this;
@@ -57,6 +85,8 @@ namespace HeroesRpg.Protocol.Game.State
         /// <param name="writer"></param>
         public void ToNetwork(BinaryWriter writer)
         {
+            writer.Write(GameTime);
+
             // header including size
             writer.Write(m_states.Count);
             foreach(var state in m_states)
@@ -73,6 +103,8 @@ namespace HeroesRpg.Protocol.Game.State
         /// <param name="reader"></param>
         public void FromNetwork(BinaryReader reader)
         {
+            GameTime = reader.ReadDouble();
+
             var size = reader.ReadInt32();
             for(var i = 0; i < size; i++)
             {

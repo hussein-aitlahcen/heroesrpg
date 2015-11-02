@@ -1,6 +1,7 @@
 using System;
 
 using CocosSharp;
+using log4net.Config;
 
 namespace HeroesRpg.Client
 {
@@ -12,7 +13,8 @@ namespace HeroesRpg.Client
         /// </summary>
 		[STAThread]
         static void Main(string[] args)
-        {                
+        {
+            XmlConfigurator.Configure();
             CCApplication application = new CCApplication(false, new CCSize(1024f, 768f));
             application.ApplicationDelegate = new AppDelegate();
             try
@@ -21,6 +23,8 @@ namespace HeroesRpg.Client
             }
             catch(Exception e)
             {
+                Console.WriteLine(e.ToString());
+                Console.Read();
             }
         }
     }

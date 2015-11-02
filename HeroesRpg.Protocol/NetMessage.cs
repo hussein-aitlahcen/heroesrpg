@@ -1,5 +1,8 @@
 ﻿using HeroesRpg.Protocol.Impl.Connection.Client;
 using HeroesRpg.Protocol.Impl.Connection.Server;
+using HeroesRpg.Protocol.Impl.Game.Map.Client;
+using HeroesRpg.Protocol.Impl.Game.Map.Server;
+using HeroesRpg.Protocol.Impl.Game.World.Server;
 using HeroesRpg.Protocol.Impl.Selection.Client;
 using HeroesRpg.Protocol.Impl.Selection.Server;
 using ProtoBuf;
@@ -12,6 +15,10 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg.Protocol
 {
+    [ProtoInclude(1015, typeof(WorldStateSnapshotMessage))]
+    [ProtoInclude(1014, typeof(EntitySpawMessage))]
+    [ProtoInclude(1013, typeof(PhysicsWorldDataRequestMessage))]
+    [ProtoInclude(1012, typeof(PhysicsWorldDataMessage))]
     [ProtoInclude(1011, typeof(CharactersListMessage))]
     [ProtoInclude(1010, typeof(CharacterSelectionResultMessage))]
     [ProtoInclude(1009, typeof(CharacterDeletionResultMessage))]
@@ -27,13 +34,19 @@ namespace HeroesRpg.Protocol
     [ProtoContract]
     public abstract class NetMessage
     {
+        private byte[] m_serializedBuffer;
+
         public byte[] Serialize()
         {
-            using (var stream = new MemoryStream())
+            if (m_serializedBuffer == null)
             {
-                Serializer.Serialize(stream, this);
-                return stream.ToArray();
+                using (var stream = new MemoryStream())
+                {
+                    Serializer.Serialize(stream, this);
+                    m_serializedBuffer = stream.ToArray();
+                }
             }
+            return m_serializedBuffer;
         }
 
         public static NetMessage Deserialize(byte[] data)

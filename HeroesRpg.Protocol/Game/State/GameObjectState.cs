@@ -12,14 +12,17 @@ namespace HeroesRpg.Protocol.Game.State
     /// <summary>
     /// 
     /// </summary>
-    public abstract class EntityState : ISerializableState
+    public sealed class GameObjectState : ISerializableState
     {
         /// <summary>
         /// 
         /// </summary>
-        public abstract StateTypeEnum Type
+        public StateTypeEnum Type
         {
-            get;
+            get
+            {
+                return StateTypeEnum.GAME_OBJECT;
+            }
         }
 
         /// <summary>
@@ -50,9 +53,18 @@ namespace HeroesRpg.Protocol.Game.State
         /// <summary>
         /// 
         /// </summary>
-        public EntityState()
+        public GameObjectState()
         {
             m_parts = new List<StatePart>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parts"></param>
+        public GameObjectState(IEnumerable<StatePart> parts)
+        {
+            m_parts = new List<StatePart>(parts);
         }
 
         /// <summary>
@@ -65,7 +77,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// 
         /// </summary>
         /// <param name="writer"></param>
-        public virtual void ToNetwork(BinaryWriter writer)
+        public void ToNetwork(BinaryWriter writer)
         {
             writer.Write(Id);
 
@@ -82,7 +94,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        public virtual void FromNetwork(BinaryReader reader)
+        public void FromNetwork(BinaryReader reader)
         {
             Id = reader.ReadInt32();
             var size = reader.ReadInt32();

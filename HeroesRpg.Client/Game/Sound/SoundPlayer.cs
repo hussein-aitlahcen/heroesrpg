@@ -41,6 +41,7 @@ namespace HeroesRpg.Client.Game.Sound
         public void PlaySound(string sound)
         {
             CCSimpleAudioEngine.SharedEngine.PlayEffect(SOUNDS_PATH + sound);
+            m_log.Debug("Palying sound : " + sound);
         }
 
         /// <summary>

@@ -7,15 +7,10 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg.Protocol.Impl.Connection.Client
 {
-    [ProtoContract]
+    [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
     public sealed class IdentificationMessage : NetMessage
     {
-        [ProtoMember(1)]
-        public string Username
-        {
-            get; set;
-        }
-        [ProtoMember(2)]
+        public string Username { get; set; }
         public string Password { get; set; }
     }
 }

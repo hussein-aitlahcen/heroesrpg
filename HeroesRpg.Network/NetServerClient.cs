@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeroesRpg.Network
@@ -17,12 +18,30 @@ namespace HeroesRpg.Network
         /// </summary>
         private Peer m_peer;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ulong NextClientId;
+        private static object NextClientIdLock = new object();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ulong ClientId
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="peer"></param>
         internal void Initialize(Peer peer)
         {
+            lock(NextClientIdLock)
+                ClientId = ++NextClientId;
             m_peer = peer;
             m_peer.SetTimeouts(5, 2000, 4000);
         }
@@ -69,7 +88,13 @@ namespace HeroesRpg.Network
         /// <param name="flags"></param>
         private void Send(byte channelId, byte[] data, PacketFlags flags)
         {
-            m_peer.Send(channelId, data, flags);
+            try
+            {
+                m_peer.Send(channelId, data, flags);
+            }
+            catch(Exception e)
+            {
+            }
         }
     }
 }

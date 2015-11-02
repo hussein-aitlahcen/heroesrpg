@@ -5,22 +5,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HeroesRpg.Protocol.Game.State.Impl
+namespace HeroesRpg.Protocol.Game.State.Part.Impl
 {
     /// <summary>
     /// 
     /// </summary>
-    public class GameObjectState : EntityState
+    public sealed class HeroEntityPart : StatePart
     {
         /// <summary>
         /// 
         /// </summary>
-        public override StateTypeEnum Type
+        public override StatePartTypeEnum Type
         {
             get
             {
-                return StateTypeEnum.GAME_OBJECT;
+                return StatePartTypeEnum.HERO_ENTITY;
             }
+        }
+
+        public int HeroId { get; private set; }
+        public string PlayerName { get; private set; }
+
+        public HeroEntityPart() { }
+
+        public HeroEntityPart(int heroId, string playerName)
+        {
+            HeroId = heroId;
+            PlayerName = playerName;
         }
 
         /// <summary>
@@ -29,7 +40,8 @@ namespace HeroesRpg.Protocol.Game.State.Impl
         /// <param name="reader"></param>
         public override void FromNetwork(BinaryReader reader)
         {
-            base.FromNetwork(reader);
+            HeroId = reader.ReadInt32();
+            PlayerName = reader.ReadString();
         }
 
         /// <summary>
@@ -38,7 +50,8 @@ namespace HeroesRpg.Protocol.Game.State.Impl
         /// <param name="writer"></param>
         public override void ToNetwork(BinaryWriter writer)
         {
-            base.ToNetwork(writer);
+            writer.Write(HeroId);
+            writer.Write(PlayerName);
         }
     }
 }

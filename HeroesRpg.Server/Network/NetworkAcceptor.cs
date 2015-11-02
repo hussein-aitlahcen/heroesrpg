@@ -11,6 +11,8 @@ using Akka.Event;
 using System.Threading;
 using HeroesRpg.Protocol.Impl.Connection.Server;
 using HeroesRpg.Protocol.Impl.Connection.Client;
+using log4net;
+using HeroesRpg.Server.Game;
 
 namespace HeroesRpg.Server.Network
 {
@@ -23,6 +25,11 @@ namespace HeroesRpg.Server.Network
         /// 
         /// </summary>
         public static NetworkAcceptor Instance => Singleton<NetworkAcceptor>.Instance;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static ILog Log = LogManager.GetLogger(typeof(NetworkAcceptor));
 
         /// <summary>
         /// 
@@ -59,9 +66,7 @@ namespace HeroesRpg.Server.Network
         /// <param name="client"></param>
         public override void OnConnected(GameClient client)
         {
-            Console.WriteLine("client connected");
-
-            client.Send(new WelcomeConnectMessage());
+            GameSystem.Instance.ClientMgr.Tell(new ClientManager.AddClient(client));
         }
 
         /// <summary>
@@ -70,7 +75,7 @@ namespace HeroesRpg.Server.Network
         /// <param name="client"></param>
         public override void OnDisconnected(GameClient client)
         {
-            Console.WriteLine("client disconnected");
+            GameSystem.Instance.ClientMgr.Tell(new ClientManager.RemoveClient(client));
         }
 
         /// <summary>
@@ -80,12 +85,7 @@ namespace HeroesRpg.Server.Network
         /// <param name="message"></param>
         public override void OnMessageReceived(GameClient client, NetMessage message)
         {
-            Console.WriteLine("client msg received : " + message.GetType().Name);
-
-            if(message is IdentificationMessage)
-            {
-                client.Send(new IdentificationResultMessage() { Code = IdentificationResultEnum.SUCCESS });
-            }
+            GameSystem.Instance.MessageProc.Tell(new MessageProcessor.ProcessMessage(client, message));
         }
     }
 }
