@@ -42,6 +42,6 @@ namespace HeroesRpg.Protocol
             {
                 return Serializer.Deserialize<NetMessage>(stream);
             }
-        }
+        }     
     }
 }

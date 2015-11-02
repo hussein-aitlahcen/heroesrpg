@@ -53,6 +53,10 @@
   <ItemGroup>
     <Compile Include="ClientConnectedMessage.cs" />
     <Compile Include="ClientDisconnectedMessage.cs" />
+    <Compile Include="Game\State\Part\Impl\CombatEntityPart.cs" />
+    <Compile Include="Game\State\Part\Impl\MovableEntityPart.cs" />
+    <Compile Include="Game\State\Part\Impl\GameObjectPart.cs" />
+    <Compile Include="Game\State\Part\Impl\StatePartFactory.cs" />
     <Compile Include="Impl\Connection\Client\IdentificationMessage.cs" />
     <Compile Include="Impl\Connection\Server\ClientVersionRequired.cs" />
     <Compile Include="Impl\Connection\Server\IdentificationResultMessage.cs" />
@@ -67,6 +71,11 @@
     <Compile Include="Impl\Selection\Server\CharactersListMessage.cs" />
     <Compile Include="NetMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Game\State\EntityState.cs" />
+    <Compile Include="Game\State\Impl\GameObjectState.cs" />
+    <Compile Include="Game\State\GameStateSnapshot.cs" />
+    <Compile Include="Game\State\ISerializableState.cs" />
+    <Compile Include="Game\State\Part\StatePart.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HeroesRpg.Common\HeroesRpg.Common.csproj">

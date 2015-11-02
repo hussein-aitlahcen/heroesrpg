@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Generic\Matcher.cs" />
+    <Compile Include="ObjectExtesions.cs" />
     <Compile Include="Manager\IManager.cs" />
     <Compile Include="Manager\Manager.cs" />
     <Compile Include="Manager\ManagerDefinitionAttribute.cs" />
