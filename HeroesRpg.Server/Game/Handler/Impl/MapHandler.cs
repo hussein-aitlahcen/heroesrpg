@@ -25,47 +25,19 @@ namespace HeroesRpg.Server.Game.Handler.Impl
         /// <param name="message"></param>
         public void Handle(ClientMessage<PhysicsWorldDataRequestMessage> message)
         {
-            message.Client.Send(new PhysicsWorldDataMessage()
+            var testObj = new DragonBallHero();
+            testObj.SetPlayerName(message.Client.ClientId.ToString());
+            testObj.SetId((int)message.Client.ClientId);
+            testObj.SetFixedRotation(true);
+            testObj.SetControllerId(message.Client.ClientId);
+            testObj.SetHeroId((int)DragonBallHeroEnum.BROLY);
+            testObj.SetWorldPosition(200, 200);
+            
+            GameSystem.Instance.MapMgr.Ask<MapManager.MapFound>(new MapManager.GetMap(0)).ContinueWith((task) =>
             {
-                GravityX = 0f,
-                GravityY = -22.0f,
-                PtmRatio = 32
+                var mapFound = task.Result;
+                mapFound.Map.Tell(new MapInstance.AddEntity(testObj));
             });
-
-            // TESTING PURPOSE                        
-            for (int i = 0; i < 15; i++)
-            {
-                var testObj = new DragonBallHero();
-                testObj.SetPlayerName("p" + i);
-                testObj.SetId(i);
-                testObj.SetControllerId(message.Client.ClientId);
-                testObj.SetHeroId((int)DragonBallHeroEnum.BROLY);
-                testObj.SetWorldPosition(100 + 50 * i, i * 20);
-
-                GameSystem.Instance.MapMgr.Ask<MapManager.MapFound>(new MapManager.GetMap(0)).ContinueWith((task) =>
-                {
-                    var mapFound = task.Result;
-                    mapFound.Map.Ask<MapInstance.AddEntityResult>(new MapInstance.AddEntity(testObj)).ContinueWith((task1) =>
-                    {
-                        if (task1.Result.Code == AddEntityResultEnum.SUCCESS)
-                        {
-                            using (var stream = new MemoryStream())
-                            {
-                                using (var writer = new BinaryWriter(stream))
-                                {
-                                    writer.Write((int)testObj.HeroType);
-                                    testObj.ToNetwork(writer);
-                                }
-                                message.Client.Send(new EntitySpawMessage()
-                                {
-                                    Type = EntityTypeEnum.HERO,
-                                    EntityData = stream.ToArray()
-                                });
-                            }
-                        }
-                    });
-                });
-            }
         }
     }
 }

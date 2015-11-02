@@ -64,6 +64,8 @@ namespace HeroesRpg.Server.Game.Entity
         /// <param name="maxLife"></param>
         public void SetMaxLife(int maxLife)
         {
+            if (MaxLife == maxLife)
+                return;
             MaxLife = maxLife;
             OnCombatPartDirty();
         }
@@ -74,10 +76,16 @@ namespace HeroesRpg.Server.Game.Entity
         /// <param name="currentLife"></param>
         public void SetCurrentLife(int currentLife)
         {
+            if (CurrentLife == currentLife)
+                return;
             CurrentLife = currentLife;
             OnCombatPartDirty();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="writer"></param>
         public override void ToNetwork(BinaryWriter writer)
         {
             base.ToNetwork(writer);

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using HeroesRpg.Protocol.Game.State.Part.Impl;
+using HeroesRpg.Protocol.Game.State.Part;
 
 namespace HeroesRpg.Client.Game.World.Entity
 {
@@ -108,6 +109,18 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             SetMaxLife(part.MaxLife);
             SetLife(part.CurrentLife);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parts"></param>
+        public override void UpdatePart(IEnumerable<StatePart> parts)
+        {
+            base.UpdatePart(parts);
+            var combatPart = parts.FirstOrDefault(part => part.Type == StatePartTypeEnum.COMBAT_ENTITY);
+            if (combatPart != null)
+                UpdateCombatEntityPart(combatPart as CombatEntityPart);
         }
     }
 }

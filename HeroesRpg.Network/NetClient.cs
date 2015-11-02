@@ -88,7 +88,7 @@ namespace HeroesRpg.Network
                 case EventType.Disconnect:
                     OnDisconnected();
                     break;
-            }
+            }            
         }
 
         /// <summary>

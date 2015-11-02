@@ -26,7 +26,6 @@ namespace HeroesRpg.Server.Network
         /// <param name="message"></param>
         public void Send(NetMessage message)
         {
-            m_log.Info("sent > " + message.GetType().Name);
             Send(message.Serialize());
         }
 
@@ -37,7 +36,7 @@ namespace HeroesRpg.Server.Network
         /// <param name="message"></param>
         public void SendUnreliable(NetMessage message)
         {
-            SendUnreliable(0, message.Serialize());
+            SendUnreliable(1, message.Serialize());
         }
 
         /// <summary>
@@ -57,7 +56,6 @@ namespace HeroesRpg.Server.Network
         /// <param name="message"></param>
         public void SendReliable(byte channelId, NetMessage message)
         {
-            m_log.Info("sent > " + message.GetType().Name);
             SendReliable(channelId, message.Serialize());
         }
     }

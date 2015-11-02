@@ -17,6 +17,7 @@ using HeroesRpg.Client.Game.World.Entity.Impl.Animated;
 using HeroesRpg.Protocol.Impl.Game.World.Server;
 using HeroesRpg.Protocol.Game.State;
 using System.IO;
+using HeroesRpg.Client.Game.World;
 
 namespace HeroesRpg.Client.Game.Graphic.Layer
 {
@@ -33,59 +34,14 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             get;
             private set;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public b2World World
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int PtmRatio
-        {
-            get;
-            private set;
-        }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public float GravityX
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float GravityY
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private Dictionary<int, GameObject> m_gameObjects;
         
         /// <summary>
         /// 
         /// </summary>
         public GameMapLayer()
         {
-            m_gameObjects = new Dictionary<int, GameObject>();
-
             Color = CCColor3B.White;
-
-            GameClient.Instance.AddFrame(this);
-                        
+            GameClient.Instance.AddFrame(this);                        
             Schedule(Update);
         }
 
@@ -95,11 +51,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         protected override void AddedToScene()
         {
             base.AddedToScene();
-
-            m_gameObjects.Clear();
-
-            World = new b2World(b2Vec2.Zero);
-            
+                        
             Floor = new CCDrawNode();
             Floor.AnchorPoint = CCPoint.AnchorLowerLeft;
             Floor.DrawRect(new CCRect(0, 0, LayerSizeInPixels.Width, 65), CCColor4B.LightGray);
@@ -112,37 +64,13 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// <summary>
         /// 
         /// </summary>
-        private void InitPhysics()
-        {
-            CCSize s = LayerSizeInPixels;
-                        
-            World.Gravity = new b2Vec2(GravityX, GravityY);
-
-            var def = new b2BodyDef();
-            def.position = new b2Vec2(0, 0);
-            def.type = b2BodyType.b2_staticBody;
-
-            var groundBody = World.CreateBody(def);
-
-            var groundBox = new b2PolygonShape();
-            groundBox.SetAsBox(s.Width / PtmRatio, 60 / PtmRatio);
-            
-            var fd = new b2FixtureDef();
-            fd.shape = groundBox;
-            fd.friction = 1f;
-
-            groundBody.CreateFixture(fd);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="obj"></param>
         public void AddGameObject(GameObject obj)
         {
-            obj.CreatePhysicsBody(World, PtmRatio);
-            AddChild(obj);
-            m_gameObjects.Add(obj.Id, obj);
+            if (MapInstance.Instance.AddGameObject(obj))
+            {
+                AddChild(obj);
+            }
         }
 
         /// <summary>
@@ -151,9 +79,10 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// <param name="obj"></param>
         public void RemoveGameObject(GameObject obj)
         {
-            World.DestroyBody(obj.PhysicsBody);
-            RemoveChild(obj);
-            m_gameObjects.Remove(obj.Id);
+            if (MapInstance.Instance.RemoveGameObject(obj.Id))
+            {
+                RemoveChild(obj);
+            }
         }
 
         /// <summary>
@@ -162,8 +91,8 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// <param name="dt"></param>
         public override void Update(float dt)
         {
-            base.Update(dt);            
-            World.Step(dt, 8, 4);
+            base.Update(dt);
+            MapInstance.Instance.UpdatePhysics(dt);   
         }
 
         /// <summary>
@@ -177,10 +106,13 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
             message.Match()
                 .With<PhysicsWorldDataMessage>((physics) =>
                 {
-                    GravityX = physics.GravityX;
-                    GravityY = physics.GravityY;
-                    PtmRatio = physics.PtmRatio;
-                    InitPhysics();
+                    MapInstance.Instance.Initialize(
+                        physics.PtmRatio,
+                        physics.GravityX,
+                        physics.GravityY,
+                        physics.VelocityIte,
+                        physics.PositionIte);
+                    Logger.Debug("Physics data received");
                     processed = true;
                 })
                 .With<EntitySpawMessage>((entitySpawn) =>
@@ -189,12 +121,15 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                     if (entity != null)
                     {
                         AddGameObject(entity);
-
+                        Logger.Debug("[entity]");
+                        Logger.Debug("id=" + entity.Id);
+                        Logger.Debug("position=" + entity.PhysicsPosition);
                         var animated = entity as AnimatedEntity;
                         if (animated != null)
                         {
+                            Logger.Debug("Animation stand for entity : " + entity.Id);
                             animated.StartAnimation(Animation.STAND);
-                        }
+                        }                      
                     }
                     processed = true;
                 })
@@ -208,16 +143,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                             snapshot.FromNetwork(reader);
                         }
                     }
-
-                    foreach(var state in snapshot.States)
-                    {
-                        switch (state.Type)
-                        {
-                            case StateTypeEnum.GAME_OBJECT:
-                                // TODO: virtual method SelectNetworkPart(parts) from gameobject
-                                break;
-                        }
-                    }
+                    WorldManager.Instance.RegisterSnapshot(snapshot);
                 });
             return processed;
         }

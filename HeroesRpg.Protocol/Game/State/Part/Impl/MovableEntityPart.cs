@@ -23,8 +23,8 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
             }
         }
 
-        public float VelocityX { get; private set; }
-        public float VelocityY { get; private set; }
+        public float ImpulseX { get; private set; }
+        public float ImpulseY { get; private set; }
 
         /// <summary>
         /// 
@@ -34,12 +34,12 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="velocityX"></param>
-        /// <param name="velocityY"></param>
-        public MovableEntityPart(float velocityX, float velocityY)
+        /// <param name="impulseX"></param>
+        /// <param name="impulseY"></param>
+        public MovableEntityPart(float impulseX, float impulseY)
         {
-            VelocityX = velocityX;
-            VelocityY = velocityY;
+            ImpulseX = impulseX;
+            ImpulseY = impulseY;
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <param name="reader"></param>
         public override void FromNetwork(BinaryReader reader)
         {
-            VelocityX = reader.ReadSingle();
-            VelocityY = reader.ReadSingle();
+            ImpulseX = reader.ReadSingle();
+            ImpulseY = reader.ReadSingle();
         }
 
         /// <summary>
@@ -58,8 +58,8 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <param name="writer"></param>
         public override void ToNetwork(BinaryWriter writer)
         {
-            writer.Write(VelocityX);
-            writer.Write(VelocityY);
+            writer.Write(ImpulseX);
+            writer.Write(ImpulseY);
         }
     }
 }

@@ -27,6 +27,11 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <summary>
         /// 
         /// </summary>
+        public override EntityTypeEnum Type => EntityTypeEnum.HERO;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public HeroTypeEnum HeroType
         {
             get;
@@ -87,6 +92,8 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <param name="reader"></param>
         public override void ToNetwork(BinaryWriter writer)
         {
+            // header
+            writer.Write((byte)HeroType);
             base.ToNetwork(writer);
             ToNetworkHeroPart(writer);
         }

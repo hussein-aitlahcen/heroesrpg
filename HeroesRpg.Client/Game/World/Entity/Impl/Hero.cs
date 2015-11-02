@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Box2D.Collision.Shapes;
 using HeroesRpg.Client.Game.World.Entity.Impl.Decoration;
 using System.IO;
+using HeroesRpg.Protocol.Game.State.Part.Impl;
+using HeroesRpg.Protocol.Game.State.Part;
 
 namespace HeroesRpg.Client.Game.World.Entity.Impl
 {
@@ -140,6 +142,24 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
             SetPlayerName(reader.ReadString());
         }
         
+        public void UpdateHeroPart(HeroEntityPart part)
+        {
+            SetHeroId(part.HeroId);
+            SetPlayerName(part.PlayerName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parts"></param>
+        public override void UpdatePart(IEnumerable<StatePart> parts)
+        {
+            base.UpdatePart(parts);
+            var heroPart = parts.FirstOrDefault(part => part.Type == StatePartTypeEnum.HERO_ENTITY);
+            if (heroPart != null)
+                UpdateHeroPart(heroPart as HeroEntityPart);
+        }
+
         /// <summary>
         /// 
         /// </summary>

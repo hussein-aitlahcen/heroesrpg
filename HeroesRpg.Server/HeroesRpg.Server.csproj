@@ -66,6 +66,7 @@
     <Compile Include="Game\Entity\CombatEntity.cs" />
     <Compile Include="Game\Entity\GameObject.cs" />
     <Compile Include="Game\Entity\Impl\DragonBallHero.cs" />
+    <Compile Include="Game\Entity\Impl\Ground.cs" />
     <Compile Include="Game\Entity\Impl\Hero.cs" />
     <Compile Include="Game\Entity\MovableEntity.cs" />
     <Compile Include="Game\Entity\StaticEntity.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Game\Map\MapInstance.cs" />
     <Compile Include="Game\Map\MapManager.cs" />
     <Compile Include="Game\Map\PhysicsWorldInstance.cs" />
+    <Compile Include="Game\Map\PrivateWorldStateSnapshot.cs" />
     <Compile Include="Game\MessageProcessor.cs" />
     <Compile Include="Network\ClientManager.cs" />
     <Compile Include="Network\GameClient.cs" />

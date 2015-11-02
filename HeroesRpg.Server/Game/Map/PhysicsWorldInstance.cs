@@ -26,7 +26,7 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="gravityY"></param>
         /// <param name="ptm"></param>
         /// <returns></returns>
-        public static Props Create(float gravityX, float gravityY, int ptm) => Props.Create(() => new PhysicsWorldInstance(gravityX, gravityY, ptm));
+        public static Props Create(float gravityX = GRAVITY_X, float gravityY = GRAVITY_Y, int ptm = PTM_RATIO) => Props.Create(() => new PhysicsWorldInstance(gravityX, gravityY, ptm));
 
         /// <summary>
         /// 
@@ -142,7 +142,12 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        public const float TICK_RATE = 1000 / 60;
+        public const float TICK_RATE = 1.0f / 60.0f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const float TICK_MS = TICK_RATE * 1000;
 
         /// <summary>
         /// 
@@ -153,6 +158,21 @@ namespace HeroesRpg.Server.Game.Map
         /// 
         /// </summary>
         public const int WORLD_POSITION_ITE = 3;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const int PTM_RATIO = 32;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const float GRAVITY_X = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const float GRAVITY_Y = -22f;
 
         /// <summary>
         /// 
@@ -211,20 +231,6 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         private void InitGround()
         {
-            var def = new b2BodyDef();
-            def.position = new b2Vec2(PointToMeter(-2500), 0);
-            def.type = b2BodyType.b2_staticBody;
-
-            var groundBody = m_world.CreateBody(def);
-
-            var groundBox = new b2PolygonShape();
-            groundBox.SetAsBox(PointToMeter(5000), PointToMeter(60));
-
-            var fd = new b2FixtureDef();
-            fd.shape = groundBox;
-            fd.friction = 1f;
-
-            groundBody.CreateFixture(fd);
         }
 
         /// <summary>
@@ -268,15 +274,15 @@ namespace HeroesRpg.Server.Game.Map
 
             var end = DateTime.Now;
             var updateTime = (end - begin).TotalMilliseconds;
-            var delta = TICK_RATE - updateTime;
-            if(updateTime > TICK_RATE)
+            var delta = TICK_MS - updateTime;
+            if(updateTime > TICK_MS)
             {
                 m_log.Info("physics world update lagged : " + updateTime);
                 m_gameTime += Math.Abs(delta);
                 delta = 1;
             }
 
-            m_gameTime += TICK_RATE;
+            m_gameTime += TICK_MS;
 
             Context.Parent.Tell(new TickDone(delta, m_gameTime));
         }

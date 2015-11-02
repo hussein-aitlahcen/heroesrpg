@@ -89,12 +89,14 @@
     <Compile Include="Game\World\Entity\Impl\Decoration\NameDecoration.cs" />
     <Compile Include="Game\World\Entity\Impl\DragonBallHero.cs" />
     <Compile Include="Game\World\Entity\Impl\EntityFactory.cs" />
+    <Compile Include="Game\World\Entity\Impl\Ground.cs" />
     <Compile Include="Game\World\Entity\Impl\Hero.cs" />
     <Compile Include="Game\World\Entity\Impl\UnknowHeroBreedException.cs" />
     <Compile Include="Game\World\Entity\CombatEntity.cs" />
     <Compile Include="Game\World\Entity\EntityDecoration.cs" />
     <Compile Include="Game\World\Entity\MovableEntity.cs" />
     <Compile Include="Game\World\Entity\StaticEntity.cs" />
+    <Compile Include="Game\World\MapInstance.cs" />
     <Compile Include="Game\World\WorldManager.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Manager\ManagerEnum.cs" />

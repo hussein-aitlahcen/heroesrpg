@@ -13,5 +13,7 @@ namespace HeroesRpg.Protocol.Impl.Game.Map.Server
         public float GravityX { get; set; }
         public float GravityY { get; set; }
         public int PtmRatio { get; set; }
+        public int VelocityIte { get; set; }
+        public int PositionIte { get; set; }
     }
 }

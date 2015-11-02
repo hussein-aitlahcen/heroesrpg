@@ -1,6 +1,7 @@
 ﻿using Box2D.Collision.Shapes;
 using Box2D.Common;
 using Box2D.Dynamics;
+using HeroesRpg.Protocol.Enum;
 using HeroesRpg.Protocol.Game.State.Part;
 using HeroesRpg.Protocol.Game.State.Part.Impl;
 using System;
@@ -105,6 +106,14 @@ namespace HeroesRpg.Server.Game.Entity
     /// </summary>
     public abstract class GameObject
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public abstract EntityTypeEnum Type
+        {
+            get;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -216,7 +225,7 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public float PositionX
+        public float InitialPositionX
         {
             get;
             private set;
@@ -225,7 +234,7 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public float PositionY
+        public float InitialPositionY
         {
             get;
             private set;
@@ -293,7 +302,7 @@ namespace HeroesRpg.Server.Game.Entity
 
             PhysicsBodyDef = new b2BodyDef();
             PhysicsBodyDef.type = BodyType;
-            PhysicsBodyDef.position = new b2Vec2(GetPointToMeter(PositionX), GetPointToMeter(PositionY));
+            PhysicsBodyDef.position = new b2Vec2(GetPointToMeter(InitialPositionX), GetPointToMeter(InitialPositionY));
             PhysicsBodyDef.fixedRotation = FixedRotation;
 
             PhysicsBody = world.CreateBody(PhysicsBodyDef);
@@ -328,8 +337,8 @@ namespace HeroesRpg.Server.Game.Entity
         /// <param name="y"></param>
         public void SetWorldPosition(int x, int y)
         {
-            PositionX = x;
-            PositionY = y;
+            InitialPositionX = x;
+            InitialPositionY = y;
             SetPhysicsPosition(GetPointToMeter(x), GetPointToMeter(y));            
             OnGameObjectPartDirty();
         }
@@ -462,8 +471,8 @@ namespace HeroesRpg.Server.Game.Entity
         public StatePart CreateGameObjectNetworkPart() =>    
                 new GameObjectPart(
                     Id,
-                    PositionX,
-                    PositionY,
+                    PhysicsBody.Position.x,
+                    PhysicsBody.Position.y,
                     Mass,
                     Density,
                     Friction,

@@ -2,6 +2,8 @@
 using Box2D.Common;
 using Box2D.Dynamics;
 using CocosSharp;
+using HeroesRpg.Protocol.Enum;
+using HeroesRpg.Protocol.Game.State.Part;
 using HeroesRpg.Protocol.Game.State.Part.Impl;
 using System;
 using System.Collections.Generic;
@@ -143,7 +145,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// 
         /// </summary>
         /// <param name="world"></param>
-        public void CreatePhysicsBody(b2World world, int ptm)
+        public virtual void CreatePhysicsBody(b2World world, int ptm)
         {
             PtmRatio = ptm;
 
@@ -262,7 +264,11 @@ namespace HeroesRpg.Client.Game.World.Entity
         public void UpdateGameObjectData(BinaryReader reader)
         {
             Id = reader.ReadInt32();
-            SetPhysicsPosition(reader.ReadSingle(), reader.ReadSingle());
+            var x =  reader.ReadSingle();
+            var y = reader.ReadSingle();
+            PositionX = GetMeterToPoint(x);
+            PositionY = GetMeterToPoint(y);
+            SetPhysicsPosition(x, y);
             Mass = reader.ReadSingle();
             Density = reader.ReadSingle();
             Friction = reader.ReadSingle();
@@ -280,6 +286,17 @@ namespace HeroesRpg.Client.Game.World.Entity
             SetMass(part.Mass);
             SetFriction(part.Friction);
             SetDensity(part.Density);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parts"></param>
+        public virtual void UpdatePart(IEnumerable<StatePart> parts)
+        {
+            var gameObjectPart = parts.FirstOrDefault(part => part.Type == StatePartTypeEnum.GAME_OBJECT);
+            if (gameObjectPart != null)
+                UpdateGameObjectPart(gameObjectPart as GameObjectPart);
         }
 
         /// <summary>

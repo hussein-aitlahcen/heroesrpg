@@ -22,6 +22,24 @@ namespace HeroesRpg.Server.Game.Entity
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public float ImpulseX
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float ImpulseY
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
          /// 
          /// </summary>
          /// <param name="id"></param>
@@ -36,7 +54,7 @@ namespace HeroesRpg.Server.Game.Entity
         protected override void InitializeNetworkParts()
         {
             base.InitializeNetworkParts();
-            AddNetworkPart(() => MovablePartDirty, () => MovablePartDirty = false, CreateGameObjectNetworkPart);
+            AddNetworkPart(() => MovablePartDirty, () => MovablePartDirty = false, CreateMovableNetworkPart);
         }
 
         /// <summary>
@@ -57,11 +75,27 @@ namespace HeroesRpg.Server.Game.Entity
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public void SetLinearVelocity(float x, float y)
+        public void SetLinearImpulse(float x, float y)
         {
             if (PhysicsBody != null)
             {
-                PhysicsBody.LinearVelocity = new b2Vec2(x, y);
+                ImpulseX = x;
+                ImpulseY = y;
+
+                ApplyLinearImpulseToCenter(new b2Vec2(x, y));
+                OnMovablePartModified();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="force"></param>
+        public void ApplyForceToCenter(b2Vec2 force)
+        {
+            if (PhysicsBody != null)
+            {
+                PhysicsBody.ApplyForceToCenter(force);
                 OnMovablePartModified();
             }
         }
@@ -103,8 +137,8 @@ namespace HeroesRpg.Server.Game.Entity
         /// <param name="reader"></param>
         public void ToMovableEntityPart(BinaryWriter writer)
         {
-            writer.Write(PhysicsBody.LinearVelocity.x);
-            writer.Write(PhysicsBody.LinearVelocity.y);
+            writer.Write(ImpulseX);
+            writer.Write(ImpulseY);
         }
 
         /// <summary>
@@ -113,7 +147,7 @@ namespace HeroesRpg.Server.Game.Entity
         /// <returns></returns>
         public MovableEntityPart CreateMovableNetworkPart() =>
             new MovableEntityPart(
-                PhysicsBody.LinearVelocity.x,
-                PhysicsBody.LinearVelocity.y);
+                ImpulseX,
+                ImpulseY);
     }
 }

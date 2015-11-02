@@ -2,9 +2,13 @@
 using Box2D.Collision.Shapes;
 using Box2D.Common;
 using Box2D.Dynamics;
+using HeroesRpg.Protocol;
+using HeroesRpg.Protocol.Enum;
 using HeroesRpg.Protocol.Game.State;
+using HeroesRpg.Protocol.Impl.Game.Map.Server;
 using HeroesRpg.Protocol.Impl.Game.World.Server;
 using HeroesRpg.Server.Game.Entity;
+using HeroesRpg.Server.Game.Entity.Impl;
 using HeroesRpg.Server.Network;
 using System;
 using System.Collections.Generic;
@@ -83,7 +87,7 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        public const int PTM_RATIO = 32;
+        public const int SNAPSHOT_BUFFER = 10;
 
         /// <summary>
         /// 
@@ -98,16 +102,25 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        private Queue<WorldStateSnapshot> m_stateSnapshots;
+        private Queue<PrivateWorldStateSnapshot> m_stateSnapshots;
 
         /// <summary>
         ///
         /// </summary>
         public MapInstance(int id)
         {
-            m_stateSnapshots = new Queue<WorldStateSnapshot>();
+            m_stateSnapshots = new Queue<PrivateWorldStateSnapshot>();
             m_gameObjects = new Dictionary<int, GameObject>();
-            m_physicsWorld = Context.ActorOf(PhysicsWorldInstance.Create(0, -22, PTM_RATIO), "physics-world");
+            m_physicsWorld = Context.ActorOf(PhysicsWorldInstance.Create(), "physics-world");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void AroundPreStart()
+        {
+            var ground = new Ground(5000, 1);
+            Self.Tell(new AddEntity(ground));
         }
 
         /// <summary>
@@ -118,39 +131,50 @@ namespace HeroesRpg.Server.Game.Map
         {
             // TODO: process client commands
 
+            var privateSnap = new PrivateWorldStateSnapshot(message.GameTime);
             var snapShot = new WorldStateSnapshot(message.GameTime);
             foreach(var gameObject in m_gameObjects.Values)
             {
+                // delta only
                 var parts = gameObject.GetDirtyParts().ToList();
-                if(parts.Count > 0)
-                    snapShot.AddState(new GameObjectState(parts));
+                if (parts.Count > 0)
+                    snapShot.AddState(new GameObjectState(gameObject.Id, parts));
+
+                // full position
+                privateSnap.AddObjectSnapshot(new GameObjectSnapshot(
+                    gameObject.Id, 
+                    gameObject.PhysicsBody.Position.x,
+                    gameObject.PhysicsBody.Position.y));
             }
 
+            m_stateSnapshots.Enqueue(privateSnap);
 
-            var netmsg = new WorldStateSnapshotMessage();
-            using (var stream = new MemoryStream())
+            CleanOutdatedSnapshot();
+            
+            // broadcast only if 
+            if (snapShot.States.Count > 0)
             {
-                using (var writer = new BinaryWriter(stream))
+                var netmsg = new WorldStateSnapshotMessage();
+                using (var stream = new MemoryStream())
                 {
-                    snapShot.ToNetwork(writer);
+                    using (var writer = new BinaryWriter(stream))
+                        snapShot.ToNetwork(writer);
+                    netmsg.WorldStateData = stream.ToArray();
                 }
-                netmsg.WorldStateData = stream.ToArray();
+                BroadcastUnreliable(netmsg);
             }
-
-            foreach(var gameObject in m_gameObjects.Values)
-            {
-                if(gameObject.ControllerId != 0)
-                {
-                    var combat = (CombatEntity)gameObject;
-                    combat.SetCurrentLife((int)Math.Floor(combat.CurrentLife + 1 * 1.1));
-                    GameSystem.Instance.ClientMgr.Tell(new ClientManager.SendUnreliable(gameObject.ControllerId, netmsg));
-                }
-            }
-
-
-                        
+                                    
             // tick the world            
             Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(message.Delta), Sender, PhysicsWorldInstance.Tick.Instance, Self);
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private void CleanOutdatedSnapshot()
+        {
+            if (m_stateSnapshots.Count > SNAPSHOT_BUFFER)
+                m_stateSnapshots.Dequeue().Dispose();
         }
 
         /// <summary>
@@ -159,15 +183,30 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(AddEntity message)
         {
-            if (m_gameObjects.ContainsKey(message.GameObj.Id))
-            {
-                Sender.Tell(new AddEntityResult(message.GameObj, AddEntityResultEnum.DUPLICATE_ID));
-            }
-            else
-            {
-                m_gameObjects.Add(message.GameObj.Id, message.GameObj);
+            if (m_gameObjects.ContainsKey(message.GameObj.Id))            
+                Sender.Tell(new AddEntityResult(message.GameObj, AddEntityResultEnum.DUPLICATE_ID));            
+            else            
                 m_physicsWorld.Forward(new PhysicsWorldInstance.CreateEntityBody(message.GameObj));
-            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void BroadcastReliable(NetMessage message)
+        {
+            foreach(var controller in m_gameObjects.Values.Select(obj => obj.ControllerId))            
+                GameSystem.Instance.ClientMgr.Tell(new ClientManager.SendReliable(controller, message));            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void BroadcastUnreliable(NetMessage message)
+        {
+            foreach (var controller in m_gameObjects.Values.Select(obj => obj.ControllerId))            
+                GameSystem.Instance.ClientMgr.Tell(new ClientManager.SendUnreliable(controller, message));            
         }
 
         /// <summary>
@@ -176,6 +215,45 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(PhysicsWorldInstance.EntityBodyCreated message)
         {
+            if (message.GameObj.ControllerId != 0)
+            {
+                GameSystem.Instance.ClientMgr.Tell(new ClientManager.SendReliable(message.GameObj.ControllerId, new PhysicsWorldDataMessage()
+                {
+                    GravityX = PhysicsWorldInstance.GRAVITY_X,
+                    GravityY = PhysicsWorldInstance.GRAVITY_Y,
+                    PtmRatio = PhysicsWorldInstance.PTM_RATIO,
+                    VelocityIte = PhysicsWorldInstance.WORLD_VELOCITY_ITE,
+                    PositionIte = PhysicsWorldInstance.WORLD_POSITION_ITE
+                }));
+            }
+
+            foreach(var gameObject in m_gameObjects.Values)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    using (var writer = new BinaryWriter(stream))
+                        gameObject.ToNetwork(writer);
+
+                    GameSystem.Instance.ClientMgr.Tell(new ClientManager.SendReliable(message.GameObj.ControllerId, new EntitySpawMessage()
+                    {
+                        Type = gameObject.Type,
+                        EntityData = stream.ToArray()
+                    }));
+                }
+            }
+
+            m_gameObjects.Add(message.GameObj.Id, message.GameObj);
+            
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BinaryWriter(stream))
+                    message.GameObj.ToNetwork(writer);
+                BroadcastReliable(new EntitySpawMessage()
+                {
+                    Type = message.GameObj.Type,
+                    EntityData = stream.ToArray()
+                });
+            }
             Sender.Tell(new AddEntityResult(message.GameObj, AddEntityResultEnum.SUCCESS));
         }
 

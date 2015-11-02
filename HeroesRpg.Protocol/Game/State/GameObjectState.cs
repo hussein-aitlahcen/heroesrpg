@@ -57,13 +57,14 @@ namespace HeroesRpg.Protocol.Game.State
         {
             m_parts = new List<StatePart>();
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="parts"></param>
-        public GameObjectState(IEnumerable<StatePart> parts)
+        public GameObjectState(int id, IEnumerable<StatePart> parts)
         {
+            Id = id;
             m_parts = new List<StatePart>(parts);
         }
 

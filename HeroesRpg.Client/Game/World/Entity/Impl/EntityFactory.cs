@@ -27,13 +27,17 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
             switch (type)
             {
                 case EntityTypeEnum.HERO:
-                    var heroType = (HeroTypeEnum)reader.ReadInt32();
+                    var heroType = (HeroTypeEnum)reader.ReadByte();
                     switch (heroType)
                     {
                         case HeroTypeEnum.DRAGON_BALL:
                             obj = new DragonBallHero();
                             break;
                     }
+                    break;
+
+                case EntityTypeEnum.GROUND:
+                    obj = new Ground();
                     break;
             }
             if(obj != null)

@@ -12,7 +12,7 @@ namespace HeroesRpg.Protocol.Enum
     public enum EntityTypeEnum
     {
         HERO = 0,
-        STATIC_OBJECT = 1,
+        GROUND = 1,
         MOVABLE_OBJECT = 2,
         PROJECTILE = 3,
     }

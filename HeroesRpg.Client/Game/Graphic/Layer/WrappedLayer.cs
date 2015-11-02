@@ -1,5 +1,6 @@
 ﻿using CocosSharp;
 using HeroesRpg.Client.Game.Graphic.Layer.HUD;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
     /// </summary>
     public abstract class WrappedLayer : CCLayerColor
     {
+        protected static ILog Logger = LogManager.GetLogger(typeof(WrappedLayer));
+
         /// <summary>
         /// 
         /// </summary>
