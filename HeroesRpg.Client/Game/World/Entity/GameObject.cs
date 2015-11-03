@@ -58,7 +58,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public b2FixtureDef PhysicsBodyFixture
+        public b2Fixture PhysicsBodyFixture
         {
             get;
             private set;
@@ -67,7 +67,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public int PtmRatio
+        public float PtmRatio
         {
             get;
             private set;
@@ -112,7 +112,16 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
-        public b2Vec2 PhysicsPosition
+        public b2Vec2 InitialPosition
+        {
+            get;
+            private set;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public float UpdateTime
         {
             get;
             private set;
@@ -126,7 +135,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             BodyType = physicsBodyType;
             AnchorPoint = CCPoint.AnchorLowerLeft;
-            PhysicsPosition = new b2Vec2(0, 0);
+            InitialPosition = new b2Vec2(0, 0);
 
             Mass = 1f;
             Density = 1f;
@@ -150,22 +159,23 @@ namespace HeroesRpg.Client.Game.World.Entity
             PtmRatio = ptm;
 
             PhysicsBodyDef = new b2BodyDef();
-            PhysicsBodyDef.position = PhysicsPosition;
+            PhysicsBodyDef.position = InitialPosition;
             PhysicsBodyDef.type = BodyType;
             PhysicsBodyDef.fixedRotation = FixedRotation;
 
             PhysicsBody = world.CreateBody(PhysicsBodyDef);
-            PhysicsBody.Mass = Mass;
 
-            PhysicsBodyFixture = new b2FixtureDef();
-            PhysicsBodyFixture.shape = CreatePhysicsShape();
-            PhysicsBodyFixture.density = Density;
-            PhysicsBodyFixture.friction = Friction;
+            PhysicsBody.ResetMassData();
 
-            PositionX = GetMeterToPoint(PhysicsPosition.x);
-            PositionY = GetMeterToPoint(PhysicsPosition.y);
+            var fixtureDef = new b2FixtureDef();
+            fixtureDef.shape = CreatePhysicsShape();
+            fixtureDef.density = Density;
+            fixtureDef.friction = Friction;
 
-            PhysicsBody.CreateFixture(PhysicsBodyFixture);
+            PhysicsBodyFixture = PhysicsBody.CreateFixture(fixtureDef);
+            
+            PositionX = GetMeterToPoint(InitialPosition.x);
+            PositionY = GetMeterToPoint(InitialPosition.y);
         }
 
         /// <summary>
@@ -188,11 +198,12 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="dt"></param>
         public override void Update(float dt)
         {
+            UpdateTime += dt;
             base.Update(dt);
             if (PhysicsBody != null)
             {
                 PositionX = GetMeterToPoint(PhysicsBody.Position.x);
-                PositionY = GetMeterToPoint(PhysicsBody.Position.y);
+                PositionY = GetMeterToPoint(PhysicsBody.Position.y);                
             }
         }
 
@@ -218,7 +229,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             Density = density;
             if (PhysicsBody != null)
             {
-                PhysicsBodyFixture.density = density;
+                PhysicsBodyFixture.Density = density;
             }
         }
 
@@ -231,7 +242,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             Friction = friction;
             if (PhysicsBody != null)
             {
-                PhysicsBodyFixture.friction = friction;
+                PhysicsBodyFixture.Friction = friction;
             }
         }
 
@@ -306,11 +317,13 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="y"></param>
         public void SetPhysicsPosition(float x, float y)
         {
-            PhysicsPosition = new b2Vec2(x, y);
+            InitialPosition = new b2Vec2(x, y);
             if(PhysicsBody != null)
             {
-                PhysicsBodyDef.position.x = x;
-                PhysicsBodyDef.position.y = y;
+                if (x != PhysicsBody.Position.x || y != PhysicsBody.Position.y)
+                {
+                    PhysicsBody.SetTransform(new b2Vec2(x, y), PhysicsBody.Angle);
+                }
             }
         }
     }

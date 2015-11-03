@@ -1,6 +1,7 @@
 ﻿using Box2D.Common;
 using Box2D.Dynamics;
 using HeroesRpg.Client.Game.World.Entity;
+using HeroesRpg.Client.Game.World.Entity.Impl;
 using HeroesRpg.Common.Generic;
 using HeroesRpg.Protocol.Game.State;
 using System;
@@ -129,7 +130,7 @@ namespace HeroesRpg.Client.Game.World
                     case StateTypeEnum.GAME_OBJECT:
                         var objState = (GameObjectState)state;
                         var obj = GetGameObject(objState.Id);
-                        if(obj != null)
+                        if(obj != null && obj.Id != WorldManager.Instance.ControlledObjectId)
                         {
                             obj.UpdatePart(objState.Parts);
                         }
@@ -144,6 +145,9 @@ namespace HeroesRpg.Client.Game.World
         /// <param name="gameObj"></param>
         public bool AddGameObject(GameObject gameObj)
         {
+            if(gameObj.Id == WorldManager.Instance.ControlledObjectId)
+                WorldManager.Instance.LocalPlayer = gameObj as Hero;
+
             if (!m_gameObjects.ContainsKey(gameObj.Id))
             {
                 gameObj.CreatePhysicsBody(World, PtmRatio);

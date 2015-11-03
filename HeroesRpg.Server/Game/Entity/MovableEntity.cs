@@ -24,7 +24,7 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public float ImpulseX
+        public int MovementSpeedX
         {
             get;
             private set;
@@ -33,16 +33,16 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public float ImpulseY
+        public int MovementSpeedY
         {
             get;
             private set;
         }
 
         /// <summary>
-         /// 
-         /// </summary>
-         /// <param name="id"></param>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
         public MovableEntity()
             : base(Box2D.Dynamics.b2BodyType.b2_dynamicBody)
         {
@@ -54,7 +54,44 @@ namespace HeroesRpg.Server.Game.Entity
         protected override void InitializeNetworkParts()
         {
             base.InitializeNetworkParts();
-            AddNetworkPart(() => MovablePartDirty, () => MovablePartDirty = false, CreateMovableNetworkPart);
+            AddNetworkPart(() => MovablePartDirty, () => MovablePartDirty = true, CreateMovableNetworkPart);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Update()
+        {
+            base.Update();
+            if(MovementSpeedX != 0 || MovementSpeedY != 0)
+            {
+                SetVelocity(MovementSpeedX, MovementSpeedY);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void SetVelocity(float x, float y)
+        {
+            if(PhysicsBody != null)
+            {
+                PhysicsBody.LinearVelocity = new b2Vec2(x, y);
+                OnMovablePartModified();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void SetMovementSpeed(int x, int y)
+        {
+            MovementSpeedX = x;
+            MovementSpeedY = y;
         }
 
         /// <summary>
@@ -69,24 +106,7 @@ namespace HeroesRpg.Server.Game.Entity
                 OnMovablePartModified();
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        public void SetLinearImpulse(float x, float y)
-        {
-            if (PhysicsBody != null)
-            {
-                ImpulseX = x;
-                ImpulseY = y;
-
-                ApplyLinearImpulseToCenter(new b2Vec2(x, y));
-                OnMovablePartModified();
-            }
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -104,11 +124,11 @@ namespace HeroesRpg.Server.Game.Entity
         /// 
         /// </summary>
         /// <param name="impulse"></param>
-        public void ApplyLinearImpulseToCenter(b2Vec2 impulse)
+        public void ApplyLinearImpulseToCenter(float x, float y)
         {
             if (PhysicsBody != null)
             {
-                PhysicsBody.ApplyLinearImpulse(impulse, PhysicsBody.WorldCenter);
+                PhysicsBody.ApplyLinearImpulse(new b2Vec2(x, y), PhysicsBody.WorldCenter);
                 OnMovablePartModified();
             }
         }
@@ -137,8 +157,11 @@ namespace HeroesRpg.Server.Game.Entity
         /// <param name="reader"></param>
         public void ToMovableEntityPart(BinaryWriter writer)
         {
-            writer.Write(ImpulseX);
-            writer.Write(ImpulseY);
+            if (PhysicsBody != null)
+            {
+                writer.Write(PhysicsBody.LinearVelocity.x);
+                writer.Write(PhysicsBody.LinearVelocity.y);
+            }
         }
 
         /// <summary>
@@ -147,7 +170,9 @@ namespace HeroesRpg.Server.Game.Entity
         /// <returns></returns>
         public MovableEntityPart CreateMovableNetworkPart() =>
             new MovableEntityPart(
-                ImpulseX,
-                ImpulseY);
+                PhysicsBody.LinearVelocity.x,
+                PhysicsBody.LinearVelocity.y,
+                PhysicsBody.Position.x,
+                PhysicsBody.Position.y);
     }
 }

@@ -8,6 +8,7 @@ using HeroesRpg.Protocol.Game.State;
 using HeroesRpg.Server.Game.Entity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,7 +53,7 @@ namespace HeroesRpg.Server.Game.Map
             /// <summary>
             /// 
             /// </summary>
-            public double GameTime
+            public long GameTime
             {
                 get;
                 private set;
@@ -62,7 +63,7 @@ namespace HeroesRpg.Server.Game.Map
             /// 
             /// </summary>
             /// <param name="snap"></param>
-            public TickDone(double delta, double time)
+            public TickDone(double delta, long time)
             {
                 Delta = delta;
                 GameTime = time;
@@ -147,6 +148,11 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
+        public const float SCHEDULER_DELAY = 10;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public const float TICK_MS = TICK_RATE * 1000;
 
         /// <summary>
@@ -183,11 +189,21 @@ namespace HeroesRpg.Server.Game.Map
         /// 
         /// </summary>
         private float m_gravityX, m_gravityY;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private Stopwatch m_updateWatch;
 
         /// <summary>
         /// 
         /// </summary>
-        private double m_gameTime;
+        private long m_lastUpdate;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private long m_gameTime;
 
         /// <summary>
         /// 
@@ -197,14 +213,21 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
+        private List<GameObject> m_objectToCreate, m_objectToDestroy;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="ptm"></param>
         public PhysicsWorldInstance(float gravityX, float gravityY, int ptm)
         {
+            m_updateWatch = new Stopwatch();
+            m_updateWatch.Start();
+            m_objectToCreate = new List<GameObject>();
+            m_objectToDestroy = new List<GameObject>();
             m_gravityX = gravityX;
             m_gravityY = gravityY;
             m_ptmRatio = ptm;
-
-            m_gameTime = 0;
 
             InitPhysics();
             InitGround();
@@ -246,9 +269,7 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(CreateEntityBody message)
         {
-            message.GameObj.CreatePhysicsBody(m_world, m_ptmRatio);
-
-            Context.Parent.Forward(new EntityBodyCreated(message.GameObj));
+            m_objectToCreate.Add(message.GameObj);            
         }
 
         /// <summary>
@@ -257,9 +278,7 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(DestroyEntityBody message)
         {
-            m_world.DestroyBody(message.GameObj.PhysicsBody);
-
-            Context.Parent.Forward(new EntityBodyDestroyed(message.GameObj));
+            m_objectToDestroy.Add(message.GameObj);
         }
 
         /// <summary>
@@ -268,31 +287,62 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(Tick message)
         {
-            var begin = DateTime.Now;
+            UpdateObjects();
 
-            UpdateWorld();
+            var begin = m_updateWatch.ElapsedMilliseconds;
+            var delta = begin - m_lastUpdate;
 
-            var end = DateTime.Now;
-            var updateTime = (end - begin).TotalMilliseconds;
-            var delta = TICK_MS - updateTime;
-            if(updateTime > TICK_MS)
-            {
+            UpdateWorld(TICK_RATE);
+
+            var end = m_updateWatch.ElapsedMilliseconds;
+            var updateTime = end - begin;
+            var updateLagged = updateTime > TICK_MS;
+            var nextDelay = 0f;
+            if(!updateLagged)
+                nextDelay = Math.Max(0, (begin + TICK_MS) - end);
+            else
                 m_log.Info("physics world update lagged : " + updateTime);
-                m_gameTime += Math.Abs(delta);
-                delta = 1;
-            }
 
-            m_gameTime += TICK_MS;
+            m_gameTime += delta;
+            m_lastUpdate = begin;
 
-            Context.Parent.Tell(new TickDone(delta, m_gameTime));
+            Context.Parent.Tell(new TickDone(nextDelay, m_gameTime));
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void UpdateWorld()
+        private void UpdateObjects()
         {
-            m_world.Step(TICK_RATE, WORLD_VELOCITY_ITE, WORLD_POSITION_ITE);
+            var c = m_objectToCreate.Count;
+            var d = m_objectToDestroy.Count;
+            var max = Math.Max(c, d);
+            for (int i = 0; i < max; i++)
+            {
+                if (i < c)
+                {
+                    var createObj = m_objectToCreate[i];
+                    createObj.CreatePhysicsBody(m_world, m_ptmRatio);
+                    Context.Parent.Tell(new EntityBodyCreated(createObj), ActorRefs.Nobody);
+                }
+                if (i < d)
+                {
+                    var destroyObj = m_objectToDestroy[i];
+                    m_world.DestroyBody(destroyObj.PhysicsBody);
+                    Context.Parent.Tell(new EntityBodyDestroyed(destroyObj), ActorRefs.Nobody);
+                }
+            }
+
+            m_objectToCreate.Clear();
+            m_objectToDestroy.Clear();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateWorld(float delta)
+        {
+            m_world.Step(delta, WORLD_VELOCITY_ITE, WORLD_POSITION_ITE);
         }
     }
 }

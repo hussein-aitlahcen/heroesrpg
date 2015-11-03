@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\build\debug\server\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\build\release\server\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -71,6 +71,7 @@
     <Compile Include="Game\Entity\MovableEntity.cs" />
     <Compile Include="Game\Entity\StaticEntity.cs" />
     <Compile Include="Game\GameSystem.cs" />
+    <Compile Include="Game\Handler\Impl\CommandHandler.cs" />
     <Compile Include="Game\Handler\Impl\ConnectionHandler.cs" />
     <Compile Include="Game\Handler\GameHandler.cs" />
     <Compile Include="Game\Handler\ClientMessage.cs" />
@@ -110,7 +111,9 @@
   <ItemGroup>
     <Content Include="Libs\box2d.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Game\Entity\Command\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -3,9 +3,11 @@ using HeroesRpg.Common.Generic;
 using HeroesRpg.Network;
 using HeroesRpg.Protocol;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeroesRpg.Client.Network
@@ -28,6 +30,11 @@ namespace HeroesRpg.Client.Network
         /// <summary>
         /// 
         /// </summary>
+        private ConcurrentQueue<NetMessage> m_messages;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsConnected
         {
             get;
@@ -39,7 +46,21 @@ namespace HeroesRpg.Client.Network
         /// </summary>
         public GameClient() : base(NetMessage.Deserialize)
         {
+            m_messages = new ConcurrentQueue<NetMessage>();
             m_frames = new List<IGameFrame>();
+            Poll();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private new void Poll()
+        {
+            base.Poll();
+
+            Thread.Sleep(5);
+
+            Task.Factory.StartNew(Poll);
         }
 
         /// <summary>
@@ -72,9 +93,7 @@ namespace HeroesRpg.Client.Network
         /// <param name="message"></param>
         public override void OnMessageReceived(NetMessage message)
         {
-            foreach (var frame in m_frames.ToArray())
-                if (frame.ProcessMessage(message))
-                    return;
+            m_messages.Enqueue(message);
         }
 
         /// <summary>
@@ -95,7 +114,15 @@ namespace HeroesRpg.Client.Network
         /// <param name="dt"></param>
         public void Update(float dt)
         {
-            Poll();
+            var length = m_messages.Count;
+            for (int i = 0; i < length; i++)
+            {
+                NetMessage message;
+                m_messages.TryDequeue(out message);
+                foreach (var frame in m_frames.ToArray())
+                    if (frame.ProcessMessage(message))
+                        return;
+            }
         }
     }
 }

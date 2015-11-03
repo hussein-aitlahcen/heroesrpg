@@ -37,6 +37,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LZ4, Version=1.0.9.93, Culture=neutral, PublicKeyToken=62e1b5ec1eec9bdd, processorArchitecture=MSIL">
+      <HintPath>..\packages\lz4net.1.0.9.93\lib\net4-client\LZ4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
       <Private>True</Private>
@@ -65,9 +69,11 @@
     <Compile Include="Impl\Connection\Server\ClientVersionRequired.cs" />
     <Compile Include="Impl\Connection\Server\IdentificationResultMessage.cs" />
     <Compile Include="Impl\Connection\Server\WelcomeConnectMessage.cs" />
+    <Compile Include="Impl\Game\Command\Client\PlayerMovementRequestMessage.cs" />
     <Compile Include="Impl\Game\Map\Client\PhysicsWorldDataRequestMessage.cs" />
     <Compile Include="Impl\Game\Map\Server\EntitySpawMessage.cs" />
     <Compile Include="Impl\Game\Map\Server\PhysicsWorldDataMessage.cs" />
+    <Compile Include="Impl\Game\World\Server\ClientControlledObjectMessage.cs" />
     <Compile Include="Impl\Game\World\Server\WorldStateSnapshotMessage.cs" />
     <Compile Include="Impl\Selection\Client\CharacterCreationMessage.cs" />
     <Compile Include="Impl\Selection\Client\CharacterDeletionMessage.cs" />
@@ -94,7 +100,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Impl\Game\Command\Client\" />
     <Folder Include="Impl\Game\Creation\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

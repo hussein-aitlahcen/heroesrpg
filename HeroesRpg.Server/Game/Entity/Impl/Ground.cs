@@ -55,7 +55,7 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(GetPointToMeter(Width / 2), GetPointToMeter(Height / 2));
+            shape.SetAsBox(GetPointToMeter(Width / 2f), GetPointToMeter(Height / 2f));
             return shape;
         }
 

@@ -1,4 +1,5 @@
-﻿using Box2D.Collision.Shapes;
+﻿using Akka.Actor;
+using Box2D.Collision.Shapes;
 using Box2D.Common;
 using Box2D.Dynamics;
 using HeroesRpg.Protocol.Enum;
@@ -113,6 +114,15 @@ namespace HeroesRpg.Server.Game.Entity
         {
             get;
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public IActorRef Map
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// 
@@ -171,7 +181,7 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public b2FixtureDef PhysicsBodyFixture
+        public b2Fixture PhysicsBodyFixture
         {
             get;
             private set;
@@ -307,13 +317,14 @@ namespace HeroesRpg.Server.Game.Entity
 
             PhysicsBody = world.CreateBody(PhysicsBodyDef);
             PhysicsBody.Mass = Mass;
+            PhysicsBody.ResetMassData();
 
-            PhysicsBodyFixture = new b2FixtureDef();
-            PhysicsBodyFixture.shape = CreatePhysicsShape();
-            PhysicsBodyFixture.density = Density;
-            PhysicsBodyFixture.friction = Friction;
+            var fixtureDef = new b2FixtureDef();
+            fixtureDef.shape = CreatePhysicsShape();
+            fixtureDef.density = Density;
+            fixtureDef.friction = Friction;
 
-            PhysicsBody.CreateFixture(PhysicsBodyFixture);
+            PhysicsBodyFixture = PhysicsBody.CreateFixture(fixtureDef);
         }
 
         /// <summary>
@@ -399,7 +410,7 @@ namespace HeroesRpg.Server.Game.Entity
             Density = density;
             if (PhysicsBody != null)
             {
-                PhysicsBodyFixture.density = density;
+                PhysicsBodyFixture.Density = density;
             }
             OnGameObjectPartDirty();
         }
@@ -413,7 +424,7 @@ namespace HeroesRpg.Server.Game.Entity
             Friction = friction;
             if (PhysicsBody != null)
             {
-                PhysicsBodyFixture.friction = friction;
+                PhysicsBodyFixture.Friction = friction;
             }
             OnGameObjectPartDirty();
         }
@@ -477,6 +488,13 @@ namespace HeroesRpg.Server.Game.Entity
                     Density,
                     Friction,
                     FixedRotation);
-        
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void Update()
+        {
+
+        }        
     }
 }

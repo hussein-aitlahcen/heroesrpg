@@ -9,6 +9,9 @@ using HeroesRpg.Client.Game.World.Entity.Impl;
 using HeroesRpg.Client.Game.Util;
 using Box2D.Common;
 using HeroesRpg.Client.Game.World.Entity.Impl.Animated;
+using HeroesRpg.Client.Network;
+using HeroesRpg.Protocol.Impl.Game.Command.Client;
+using HeroesRpg.Client.Game.World;
 
 namespace HeroesRpg.Client.Game.Graphic.Scene
 {
@@ -26,7 +29,15 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             private set;
         }
 
-        private Hero m_hero;
+        /// <summary>
+        /// 
+        /// </summary>
+        private sbyte MovementX;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private sbyte MovementY;
 
         /// <summary>
         /// 
@@ -48,17 +59,18 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             switch (ev.Keys)
             {
                 case CCKeys.Space:
-                    //to change velocity by 10
-                    float impulse = m_hero.PhysicsBody.Mass * 10;
-                    m_hero.ApplyLinearImpulseToCenter(new b2Vec2(0, impulse));
                     break;
 
                 case CCKeys.Left:
+                    MovementX--;
+                    SendMovementRequest();
                     break;
 
                 case CCKeys.Right:
+                    MovementX++;
+                    SendMovementRequest();
                     break;
-            }
+            }            
         }
 
         /// <summary>
@@ -71,10 +83,26 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             switch (ev.Keys)
             {
                 case CCKeys.Left:
+                    MovementX++;
+                    SendMovementRequest();
                     break;
 
                 case CCKeys.Right:
+                    MovementX--;
+                    SendMovementRequest();
                     break;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SendMovementRequest()
+        {
+            GameClient.Instance.Send(new PlayerMovementRequestMessage() { MovementX = MovementX, MovementY = MovementY });
+            if (WorldManager.Instance.LocalPlayer != null)
+            {
+                WorldManager.Instance.LocalPlayer.SetMovementSpeed(MovementX, MovementY);
             }
         }
     }

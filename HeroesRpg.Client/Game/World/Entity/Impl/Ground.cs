@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using CocosSharp;
 
 namespace HeroesRpg.Client.Game.World.Entity.Impl
 {
@@ -15,23 +16,14 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
     {
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public CCDrawNode GroundSprite { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
         public Ground()
         {
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public Ground(int width, int height)
-        {
-            Width = width;
-            Height = height;
+            AddChild(GroundSprite = new CCDrawNode());
         }
         
         /// <summary>
@@ -41,7 +33,9 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(GetPointToMeter(Width / 2), GetPointToMeter(Height / 2));
+            shape.SetAsBox(GetPointToMeter(Width / 2f), GetPointToMeter(Height / 2f));
+            ContentSize = new CCSize(Width, Height);
+            GroundSprite.DrawRect(new CCRect(0, 0, Width, GetMeterToPoint(Height)), CCColor4B.Black);
             return shape;
         }
 

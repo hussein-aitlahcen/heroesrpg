@@ -1,4 +1,5 @@
-﻿using HeroesRpg.Common.Generic;
+﻿using HeroesRpg.Client.Game.World.Entity.Impl;
+using HeroesRpg.Common.Generic;
 using HeroesRpg.Protocol.Game.State;
 using log4net;
 using System;
@@ -32,7 +33,30 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
-        private double m_gameTime;
+        private long m_gameTime;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long GameTime => m_gameTime;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int ControlledObjectId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Hero LocalPlayer
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// 
@@ -62,8 +86,6 @@ namespace HeroesRpg.Client.Game.World
             {
                 m_gameTime = snapShot.GameTime;
                 m_stateSnapshots.Enqueue(snapShot);
-                if (m_stateSnapshots.Count > MAX_SNAP_BUFFER)
-                    m_stateSnapshots.Dequeue();
             }
             else
             {

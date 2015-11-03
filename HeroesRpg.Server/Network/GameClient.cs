@@ -1,6 +1,7 @@
 ﻿using Akka.Event;
 using HeroesRpg.Network;
 using HeroesRpg.Protocol;
+using HeroesRpg.Server.Game.Entity;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,14 @@ namespace HeroesRpg.Server.Network
         /// 
         /// </summary>
         private readonly ILog m_log = LogManager.GetLogger(typeof(GameClient));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public GameObject ControlledObject
+        {
+            get; set;
+        }
         
         /// <summary>
         /// 

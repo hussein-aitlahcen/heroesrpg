@@ -2,6 +2,7 @@
 using HeroesRpg.Protocol.Enum;
 using HeroesRpg.Protocol.Impl.Game.Map.Client;
 using HeroesRpg.Protocol.Impl.Game.Map.Server;
+using HeroesRpg.Protocol.Impl.Game.World.Server;
 using HeroesRpg.Server.Game.Entity.Impl;
 using HeroesRpg.Server.Game.Map;
 using System;
@@ -32,6 +33,9 @@ namespace HeroesRpg.Server.Game.Handler.Impl
             testObj.SetControllerId(message.Client.ClientId);
             testObj.SetHeroId((int)DragonBallHeroEnum.BROLY);
             testObj.SetWorldPosition(200, 200);
+
+            message.Client.ControlledObject = testObj;
+            message.Client.Send(new ClientControlledObjectMessage() { ObjectId = testObj.Id });
             
             GameSystem.Instance.MapMgr.Ask<MapManager.MapFound>(new MapManager.GetMap(0)).ContinueWith((task) =>
             {

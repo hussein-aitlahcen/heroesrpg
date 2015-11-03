@@ -1,4 +1,5 @@
 ﻿using Akka.Actor;
+using Akka.Event;
 using Box2D.Collision.Shapes;
 using Box2D.Common;
 using Box2D.Dynamics;
@@ -38,39 +39,55 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        public sealed class AddEntity
+        public sealed class MovementCommand : MapInstanceMessage
         {
-            public GameObject GameObj { get; private set; }
-            public AddEntity(GameObject obj)
+            public sbyte X { get; }
+            public sbyte Y { get; }
+            public MovementCommand(GameObject obj, sbyte movementX, sbyte movementY) : base(obj)
             {
-                GameObj = obj;
+                X = movementX;
+                Y = movementY;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public sealed class RemoveEntity
+        public sealed class AddEntity : MapInstanceMessage
         {
-            public GameObject GameObj { get; private set; }
-            public RemoveEntity(GameObject obj)
+            public AddEntity(GameObject obj) : base(obj)
             {
-                GameObj = obj;
             }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public sealed class AddEntityResult
+        public sealed class RemoveEntity : MapInstanceMessage
         {
-            public GameObject GameObj { get; private set; }
+            public RemoveEntity(GameObject obj) : base(obj)
+            {
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public sealed class AddEntityResult : MapInstanceMessage
+        {
             public AddEntityResultEnum Code { get; private set; }
+            public AddEntityResult(GameObject obj, AddEntityResultEnum resultCode) : base(obj)
+            {
+                Code = resultCode;
+            }
+        }
 
-            public AddEntityResult(GameObject obj, AddEntityResultEnum resultCode)
+        public abstract class MapInstanceMessage
+        {
+            public GameObject GameObj { get; private set; }
+            public MapInstanceMessage(GameObject obj)
             {
                 GameObj = obj;
-                Code = resultCode;
             }
         }
     }
@@ -82,12 +99,23 @@ namespace HeroesRpg.Server.Game.Map
         IHandle<MapInstance.AddEntity>,
         IHandle<MapInstance.RemoveEntity>,
         IHandle<PhysicsWorldInstance.EntityBodyCreated>,
-        IHandle<PhysicsWorldInstance.TickDone>
+        IHandle<PhysicsWorldInstance.TickDone>,
+        IHandle<MapInstance.MovementCommand>
     {
         /// <summary>
         /// 
         /// </summary>
+        private readonly ILoggingAdapter Logger = Logging.GetLogger(Context);
+
+        /// <summary>
+        /// 
+        /// </summary>
         public const int SNAPSHOT_BUFFER = 10;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const long SNAPSHOT_TICK = 1000 / 20;
 
         /// <summary>
         /// 
@@ -104,6 +132,11 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         private Queue<PrivateWorldStateSnapshot> m_stateSnapshots;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private long m_nextSnapshot;
+        
         /// <summary>
         ///
         /// </summary>
@@ -130,30 +163,46 @@ namespace HeroesRpg.Server.Game.Map
         public void Handle(PhysicsWorldInstance.TickDone message)
         {
             // TODO: process client commands
-
-            var privateSnap = new PrivateWorldStateSnapshot(message.GameTime);
-            var snapShot = new WorldStateSnapshot(message.GameTime);
-            foreach(var gameObject in m_gameObjects.Values)
-            {
-                // delta only
-                var parts = gameObject.GetDirtyParts().ToList();
-                if (parts.Count > 0)
-                    snapShot.AddState(new GameObjectState(gameObject.Id, parts));
-
-                // full position
-                privateSnap.AddObjectSnapshot(new GameObjectSnapshot(
-                    gameObject.Id, 
-                    gameObject.PhysicsBody.Position.x,
-                    gameObject.PhysicsBody.Position.y));
-            }
-
-            m_stateSnapshots.Enqueue(privateSnap);
-
-            CleanOutdatedSnapshot();
             
-            // broadcast only if 
-            if (snapShot.States.Count > 0)
+            TakeSnapshotIfRequired(message.GameTime);
+
+            // tick back
+            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(message.Delta), Sender, PhysicsWorldInstance.Tick.Instance, Self);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void TakeSnapshotIfRequired(long gameTime)
+        {
+            if (m_nextSnapshot < gameTime)
             {
+                m_nextSnapshot = gameTime + SNAPSHOT_TICK;
+
+                var privateSnap = new PrivateWorldStateSnapshot(gameTime);
+                var snapShot = new WorldStateSnapshot(gameTime);
+                foreach (var gameObject in m_gameObjects.Values)
+                {
+                    gameObject.Update();
+
+                    if (gameObject is MovableEntity)
+                    {
+                        var m = gameObject as MovableEntity;
+                    }
+                    // delta only
+                    var parts = gameObject.GetDirtyParts().ToList();
+                    if (parts.Count > 0)
+                        snapShot.AddState(new GameObjectState(gameObject.Id, parts));
+
+                    // full position
+                    privateSnap.AddObjectSnapshot(new GameObjectSnapshot(
+                        gameObject.Id,
+                        gameObject.PhysicsBody.Position.x,
+                        gameObject.PhysicsBody.Position.y));
+                }
+
+                CleanOutdatedSnapshot(privateSnap);
+                
                 var netmsg = new WorldStateSnapshotMessage();
                 using (var stream = new MemoryStream())
                 {
@@ -163,16 +212,14 @@ namespace HeroesRpg.Server.Game.Map
                 }
                 BroadcastUnreliable(netmsg);
             }
-                                    
-            // tick the world            
-            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(message.Delta), Sender, PhysicsWorldInstance.Tick.Instance, Self);
         }
         
         /// <summary>
         /// 
         /// </summary>
-        private void CleanOutdatedSnapshot()
+        private void CleanOutdatedSnapshot(PrivateWorldStateSnapshot snapShot)
         {
+            m_stateSnapshots.Enqueue(snapShot);
             if (m_stateSnapshots.Count > SNAPSHOT_BUFFER)
                 m_stateSnapshots.Dequeue().Dispose();
         }
@@ -186,7 +233,7 @@ namespace HeroesRpg.Server.Game.Map
             if (m_gameObjects.ContainsKey(message.GameObj.Id))            
                 Sender.Tell(new AddEntityResult(message.GameObj, AddEntityResultEnum.DUPLICATE_ID));            
             else            
-                m_physicsWorld.Forward(new PhysicsWorldInstance.CreateEntityBody(message.GameObj));
+                m_physicsWorld.Forward(new PhysicsWorldInstance.CreateEntityBody(message.GameObj));            
         }
 
         /// <summary>
@@ -215,6 +262,8 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(PhysicsWorldInstance.EntityBodyCreated message)
         {
+            message.GameObj.Map = Self;
+
             if (message.GameObj.ControllerId != 0)
             {
                 GameSystem.Instance.ClientMgr.Tell(new ClientManager.SendReliable(message.GameObj.ControllerId, new PhysicsWorldDataMessage()
@@ -264,6 +313,17 @@ namespace HeroesRpg.Server.Game.Map
         public void Handle(RemoveEntity message)
         {
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        public void Handle(MovementCommand message)
+        {
+            var mv = message.GameObj as MovableEntity;
+            mv.SetMovementSpeed(message.X * 10, message.Y * 10);            
+            Logger.Info("movement command : " + message.X);
         }
     }
 }

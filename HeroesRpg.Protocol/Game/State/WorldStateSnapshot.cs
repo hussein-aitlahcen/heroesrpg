@@ -15,7 +15,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// <summary>
         /// 
         /// </summary>
-        public double GameTime
+        public long GameTime
         {
             get;
             private set;
@@ -41,7 +41,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public WorldStateSnapshot(double gameTime) : this()
+        public WorldStateSnapshot(long gameTime) : this()
         {
             GameTime = gameTime;
         }
@@ -103,7 +103,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// <param name="reader"></param>
         public void FromNetwork(BinaryReader reader)
         {
-            GameTime = reader.ReadDouble();
+            GameTime = reader.ReadInt64();
 
             var size = reader.ReadInt32();
             for(var i = 0; i < size; i++)

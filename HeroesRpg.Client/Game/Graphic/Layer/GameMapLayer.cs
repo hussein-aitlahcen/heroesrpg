@@ -25,16 +25,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
     /// 
     /// </summary>
     public sealed class GameMapLayer : WrappedLayer, IDisposable, IGameFrame
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public CCDrawNode Floor
-        {
-            get;
-            private set;
-        }
-        
+    {        
         /// <summary>
         /// 
         /// </summary>
@@ -52,12 +43,6 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         {
             base.AddedToScene();
                         
-            Floor = new CCDrawNode();
-            Floor.AnchorPoint = CCPoint.AnchorLowerLeft;
-            Floor.DrawRect(new CCRect(0, 0, LayerSizeInPixels.Width, 65), CCColor4B.LightGray);
-
-            AddChild(Floor);
-
             GameClient.Instance.Send(new PhysicsWorldDataRequestMessage());
         }
 
@@ -115,6 +100,10 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                     Logger.Debug("Physics data received");
                     processed = true;
                 })
+                .With<ClientControlledObjectMessage>((m) =>
+                {
+                    WorldManager.Instance.ControlledObjectId = m.ObjectId;
+                })
                 .With<EntitySpawMessage>((entitySpawn) =>
                 {
                     var entity = EntityFactory.Instance.CreateFromNetwork(entitySpawn.Type, entitySpawn.EntityData);
@@ -123,13 +112,13 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                         AddGameObject(entity);
                         Logger.Debug("[entity]");
                         Logger.Debug("id=" + entity.Id);
-                        Logger.Debug("position=" + entity.PhysicsPosition);
+                        Logger.Debug("position=" + entity.InitialPosition);
                         var animated = entity as AnimatedEntity;
                         if (animated != null)
                         {
                             Logger.Debug("Animation stand for entity : " + entity.Id);
                             animated.StartAnimation(Animation.STAND);
-                        }                      
+                        }                     
                     }
                     processed = true;
                 })

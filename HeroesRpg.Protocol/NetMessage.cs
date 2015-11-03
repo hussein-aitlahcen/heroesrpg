@@ -1,5 +1,6 @@
 ﻿using HeroesRpg.Protocol.Impl.Connection.Client;
 using HeroesRpg.Protocol.Impl.Connection.Server;
+using HeroesRpg.Protocol.Impl.Game.Command.Client;
 using HeroesRpg.Protocol.Impl.Game.Map.Client;
 using HeroesRpg.Protocol.Impl.Game.Map.Server;
 using HeroesRpg.Protocol.Impl.Game.World.Server;
@@ -15,6 +16,8 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg.Protocol
 {
+    [ProtoInclude(1017, typeof(ClientControlledObjectMessage))]
+    [ProtoInclude(1016, typeof(PlayerMovementRequestMessage))]
     [ProtoInclude(1015, typeof(WorldStateSnapshotMessage))]
     [ProtoInclude(1014, typeof(EntitySpawMessage))]
     [ProtoInclude(1013, typeof(PhysicsWorldDataRequestMessage))]
@@ -42,7 +45,8 @@ namespace HeroesRpg.Protocol
             {
                 using (var stream = new MemoryStream())
                 {
-                    Serializer.Serialize(stream, this);
+                    using (var lzStream = new LZ4.LZ4Stream(stream, LZ4.LZ4StreamMode.Compress))
+                        Serializer.Serialize(lzStream, this);
                     m_serializedBuffer = stream.ToArray();
                 }
             }
@@ -51,7 +55,7 @@ namespace HeroesRpg.Protocol
 
         public static NetMessage Deserialize(byte[] data)
         {
-            using (var stream = new MemoryStream(data))
+            using (var stream = new LZ4.LZ4Stream(new MemoryStream(data), LZ4.LZ4StreamMode.Decompress))
             {
                 return Serializer.Deserialize<NetMessage>(stream);
             }

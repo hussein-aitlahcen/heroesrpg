@@ -3,6 +3,7 @@ using Akka.Event;
 using HeroesRpg.Protocol;
 using HeroesRpg.Protocol.Impl.Connection.Client;
 using HeroesRpg.Protocol.Impl.Connection.Server;
+using HeroesRpg.Protocol.Impl.Game.Command.Client;
 using HeroesRpg.Protocol.Impl.Game.Map.Client;
 using HeroesRpg.Protocol.Impl.Selection.Client;
 using HeroesRpg.Server.Game.Handler;
@@ -44,7 +45,9 @@ namespace HeroesRpg.Server.Game
             netmsg
                 .Match()
                 .With<IdentificationMessage>((m) => Handle<ConnectionHandler, IdentificationMessage>(client, m))
-                .With<PhysicsWorldDataRequestMessage>((m) => Handle<MapHandler, PhysicsWorldDataRequestMessage>(client, m));
+                .With<PhysicsWorldDataRequestMessage>((m) => Handle<MapHandler, PhysicsWorldDataRequestMessage>(client, m))
+                .With<PlayerMovementRequestMessage>((m) => Handle<CommandHandler, PlayerMovementRequestMessage>(client, m))
+                .Default((obj) => m_log.Debug("unhandled msg {0}", obj.GetType().Name));
 
             m_log.Info("received < {0}", message.Message.GetType().Name);
         }
