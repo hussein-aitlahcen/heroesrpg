@@ -6,6 +6,7 @@ using HeroesRpg.Common.Generic;
 using HeroesRpg.Protocol.Game.State;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,7 +67,17 @@ namespace HeroesRpg.Client.Game.World
         {
             get;
             private set;
-        }
+        }      
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private Stopwatch m_updateWatch;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private double m_lastUpdate;
 
         /// <summary>
         /// 
@@ -78,6 +89,7 @@ namespace HeroesRpg.Client.Game.World
         /// </summary>
         public MapInstance()
         {
+            m_updateWatch = Stopwatch.StartNew();
             m_gameObjects = new Dictionary<int, GameObject>();
             World = new b2World(new b2Vec2(0, 0));
         }
@@ -107,6 +119,8 @@ namespace HeroesRpg.Client.Game.World
         private void InitPhysics()
         {
             World.Gravity = new b2Vec2(GravityX, GravityY);
+
+            m_updateWatch.Restart();
         }
 
         /// <summary>
@@ -115,7 +129,12 @@ namespace HeroesRpg.Client.Game.World
         public void UpdatePhysics(float dt)
         {
             WorldManager.Instance.UpdateEntities();
-            World.Step(dt, VelocityIterations, PositionIterations);
+
+            var begin = m_updateWatch.Elapsed.TotalSeconds;
+            var delta = (float)(begin - m_lastUpdate);
+            m_lastUpdate = begin;
+
+            World.Step(delta, VelocityIterations, PositionIterations);
         }
 
         /// <summary>

@@ -33,6 +33,7 @@ namespace HeroesRpg.Server.Game.Handler.Impl
             testObj.SetControllerId(message.Client.ClientId);
             testObj.SetHeroId((int)DragonBallHeroEnum.BROLY);
             testObj.SetWorldPosition(200, 200);
+            testObj.SetCurrentLife(1000);
 
             message.Client.ControlledObject = testObj;
             message.Client.Send(new ClientControlledObjectMessage() { ObjectId = testObj.Id });

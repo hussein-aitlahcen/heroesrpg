@@ -179,8 +179,7 @@ namespace HeroesRpg.Server.Game.Map
             // TODO: process client commands            
             TakeSnapshotIfRequired(message.GameTime);
 
-            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(10), Sender, PhysicsWorldInstance.Tick.Instance, Self);
-            //Sender.Tell(PhysicsWorldInstance.Tick.Instance);   
+            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(0), Sender, PhysicsWorldInstance.Tick.Instance, Self);
         }
 
         /// <summary>

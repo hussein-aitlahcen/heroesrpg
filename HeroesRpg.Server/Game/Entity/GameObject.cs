@@ -132,6 +132,15 @@ namespace HeroesRpg.Server.Game.Entity
             get;
             set;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool PhysicPartDirty
+        {
+            get;
+            set;
+        }
         
         /// <summary>
         /// 
@@ -294,6 +303,7 @@ namespace HeroesRpg.Server.Game.Entity
         protected virtual void InitializeNetworkParts()
         {
             AddNetworkPart(() => GameObjectPartDirty, () => GameObjectPartDirty = false, CreateGameObjectNetworkPart);
+            AddNetworkPart(() => PhysicPartDirty, () => PhysicPartDirty = false, CreatePhysicNetworkPart);
         }
 
         /// <summary>
@@ -398,7 +408,7 @@ namespace HeroesRpg.Server.Game.Entity
             {
                 PhysicsBody.Mass = mass;
             }
-            OnGameObjectPartDirty();
+            OnPhysicPartDirty();
         }
 
         /// <summary>
@@ -412,7 +422,7 @@ namespace HeroesRpg.Server.Game.Entity
             {
                 PhysicsBodyFixture.Density = density;
             }
-            OnGameObjectPartDirty();
+            OnPhysicPartDirty();
         }
 
         /// <summary>
@@ -426,7 +436,7 @@ namespace HeroesRpg.Server.Game.Entity
             {
                 PhysicsBodyFixture.Friction = friction;
             }
-            OnGameObjectPartDirty();
+            OnPhysicPartDirty();
         }
 
         /// <summary>
@@ -440,7 +450,7 @@ namespace HeroesRpg.Server.Game.Entity
             {
                 PhysicsBodyDef.fixedRotation = fixedRotation;
             }
-            OnGameObjectPartDirty();
+            OnPhysicPartDirty();
         }
 
         /// <summary>
@@ -454,17 +464,16 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="writer"></param>
-        public virtual void ToNetwork(BinaryWriter writer)
+        private void OnPhysicPartDirty()
         {
-            ToNetworkGameObjectPart(writer);
+            PhysicPartDirty = true;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="writer"></param>
-        public void ToNetworkGameObjectPart(BinaryWriter writer)
+        public virtual void ToNetwork(BinaryWriter writer)
         {
             writer.Write(Id);
             writer.Write(PhysicsBody.Position.x);
@@ -474,7 +483,7 @@ namespace HeroesRpg.Server.Game.Entity
             writer.Write(Friction);
             writer.Write(FixedRotation);
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -483,11 +492,14 @@ namespace HeroesRpg.Server.Game.Entity
                 new GameObjectPart(
                     Id,
                     PhysicsBody.Position.x,
-                    PhysicsBody.Position.y,
-                    Mass,
-                    Density,
-                    Friction,
-                    FixedRotation);
+                    PhysicsBody.Position.y);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public StatePart CreatePhysicNetworkPart() =>
+            new PhysicObjectPart(Mass, Density, Friction, FixedRotation);
 
         /// <summary>
         /// 

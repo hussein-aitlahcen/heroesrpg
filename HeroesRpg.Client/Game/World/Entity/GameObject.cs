@@ -276,17 +276,8 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="reader"></param>
         public virtual void FromNetwork(BinaryReader reader)
         {
-            UpdateGameObjectData(reader);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        public void UpdateGameObjectData(BinaryReader reader)
-        {
             Id = reader.ReadInt32();
-            var x =  reader.ReadSingle();
+            var x = reader.ReadSingle();
             var y = reader.ReadSingle();
             PositionX = GetMeterToPoint(x);
             PositionY = GetMeterToPoint(y);
@@ -305,9 +296,18 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             Id = part.Id;
             SetPhysicsPosition(part.PositionX, part.PositionY);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="part"></param>
+        public void UpdatePhysicPart(PhysicObjectPart part)
+        {
             SetMass(part.Mass);
             SetFriction(part.Friction);
             SetDensity(part.Density);
+            SetFixedRotation(part.FixedRotation);
         }
 
         /// <summary>
@@ -319,6 +319,9 @@ namespace HeroesRpg.Client.Game.World.Entity
             var gameObjectPart = parts.FirstOrDefault(part => part.Type == StatePartTypeEnum.GAME_OBJECT);
             if (gameObjectPart != null)
                 UpdateGameObjectPart(gameObjectPart as GameObjectPart);
+            var physicPart = parts.OfType<PhysicObjectPart>().FirstOrDefault();
+            if (physicPart != null)
+                UpdatePhysicPart(physicPart);
         }
 
         /// <summary>

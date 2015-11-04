@@ -61,6 +61,7 @@
     <Compile Include="Game\State\Part\Impl\HeroEntityPart.cs" />
     <Compile Include="Game\State\Part\Impl\MovableEntityPart.cs" />
     <Compile Include="Game\State\Part\Impl\GameObjectPart.cs" />
+    <Compile Include="Game\State\Part\Impl\PhysicObjectPart.cs" />
     <Compile Include="Game\State\Part\Impl\StatePartFactory.cs" />
     <Compile Include="Enum\DragonBallHeroEnum.cs" />
     <Compile Include="Enum\EntityTypeEnum.cs" />

@@ -35,6 +35,7 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
                 case StatePartTypeEnum.MOVABLE_ENTITY: part = new MovableEntityPart(); break; 
                 case StatePartTypeEnum.COMBAT_ENTITY: part = new CombatEntityPart(); break;
                 case StatePartTypeEnum.HERO_ENTITY: part = new HeroEntityPart(); break;
+                case StatePartTypeEnum.PHYSIC_OBJECT: part = new PhysicObjectPart(); break;
                 default: throw new ArgumentException("unknow state part type id : " + type);
             }
             try {

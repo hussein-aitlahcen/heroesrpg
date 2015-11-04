@@ -19,17 +19,12 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
-        public const int MAX_SNAP_BUFFER = 10;
-
-        /// <summary>
-        /// 
-        /// </summary>
         public const int MIN_SNAP_BUFFER = 2;
 
         /// <summary>
         /// 
         /// </summary>
-        public const int CL_INTERPOLATION = MIN_SNAP_BUFFER * 50;
+        public const int CL_INTERPOLATION = MIN_SNAP_BUFFER;
 
         /// <summary>
         /// 
@@ -130,8 +125,17 @@ namespace HeroesRpg.Client.Game.World
             
             var diffX = Math.Abs(InterpolationState.PositionX - nextX);
             var diffY = Math.Abs(InterpolationState.PositionY - nextY);
-
-            return diffX <= MovableEntity.INTERPOLATION_MIN_DELTA && diffY <= MovableEntity.INTERPOLATION_MIN_DELTA;
+            var diffTime = GameTime - InterpolationState.GameTime;
+            
+            return 
+                ((InterpolationState.PositionX > nextX && InterpolationState.VelocityX > 0 || 
+                InterpolationState.PositionX < nextX && InterpolationState.VelocityX < 0) 
+                && 
+                (InterpolationState.PositionY > nextY && InterpolationState.VelocityY > 0 || 
+                InterpolationState.PositionY < nextY && InterpolationState.VelocityY < 0))                
+                ||
+                (diffX <= MovableEntity.INTERPOLATION_MIN_DELTA &&
+                diffY <= MovableEntity.INTERPOLATION_MIN_DELTA);
         }
 
         /// <summary>

@@ -13,6 +13,7 @@ namespace HeroesRpg.Protocol.Game.State.Part
     public enum StatePartTypeEnum
     {
         GAME_OBJECT,
+        PHYSIC_OBJECT,
         MOVABLE_ENTITY,
         STATIC_ENTITY,
         COMBAT_ENTITY,

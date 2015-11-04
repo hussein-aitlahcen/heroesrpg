@@ -31,7 +31,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// </summary>
         public GameMapLayer()
         {
-            Color = CCColor3B.White;
+            Color = CCColor3B.Gray;
             GameClient.Instance.AddFrame(this);                        
             Schedule(Update);
         }
