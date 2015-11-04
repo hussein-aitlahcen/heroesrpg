@@ -5,6 +5,7 @@ using CocosSharp;
 using HeroesRpg.Protocol.Enum;
 using HeroesRpg.Protocol.Game.State.Part;
 using HeroesRpg.Protocol.Game.State.Part.Impl;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,11 +23,21 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        protected static ILog Logger = LogManager.GetLogger(typeof(GameObject));
+
+        /// <summary>
+        /// 
+        /// </summary>
         public int Id
         {
             get;
             private set;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsLocal => WorldManager.Instance.ControlledObjectId == Id;
 
         /// <summary>
         /// 

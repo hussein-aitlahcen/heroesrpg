@@ -292,21 +292,18 @@ namespace HeroesRpg.Server.Game.Map
             var begin = m_updateWatch.ElapsedMilliseconds;
             var delta = begin - m_lastUpdate;
 
-            UpdateWorld(TICK_RATE);
+            UpdateWorld(delta * 0.001f);
 
             var end = m_updateWatch.ElapsedMilliseconds;
             var updateTime = end - begin;
             var updateLagged = updateTime > TICK_MS;
-            var nextDelay = 0f;
-            if(!updateLagged)
-                nextDelay = Math.Max(0, (begin + TICK_MS) - end);
-            else
+            if(updateLagged)
                 m_log.Info("physics world update lagged : " + updateTime);
 
             m_gameTime += delta;
             m_lastUpdate = begin;
 
-            Context.Parent.Tell(new TickDone(nextDelay, m_gameTime));
+            Context.Parent.Tell(new TickDone(delta, m_gameTime));
         }
 
         /// <summary>

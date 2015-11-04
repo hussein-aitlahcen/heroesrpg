@@ -132,7 +132,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                             snapshot.FromNetwork(reader);
                         }
                     }
-                    WorldManager.Instance.RegisterSnapshot(snapshot);
+                    WorldManager.Instance.AddWorldStateSnapshot(snapshot);
                 });
             return processed;
         }

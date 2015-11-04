@@ -130,7 +130,7 @@ namespace HeroesRpg.Client.Game.World
                     case StateTypeEnum.GAME_OBJECT:
                         var objState = (GameObjectState)state;
                         var obj = GetGameObject(objState.Id);
-                        if(obj != null && obj.Id != WorldManager.Instance.ControlledObjectId)
+                        if(obj != null)
                         {
                             obj.UpdatePart(objState.Parts);
                         }
@@ -145,7 +145,7 @@ namespace HeroesRpg.Client.Game.World
         /// <param name="gameObj"></param>
         public bool AddGameObject(GameObject gameObj)
         {
-            if(gameObj.Id == WorldManager.Instance.ControlledObjectId)
+            if(gameObj.IsLocal)
                 WorldManager.Instance.LocalPlayer = gameObj as Hero;
 
             if (!m_gameObjects.ContainsKey(gameObj.Id))

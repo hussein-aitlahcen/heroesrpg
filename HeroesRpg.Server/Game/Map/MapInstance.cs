@@ -115,7 +115,12 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        public const long SNAPSHOT_TICK = 1000 / 20;
+        public const long SNAPSHOT_TICK = 1000 / 40;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const long TICK = 10;
 
         /// <summary>
         /// 
@@ -135,6 +140,11 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
+        private Queue<Action> m_playerCommands;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private long m_nextSnapshot;
         
         /// <summary>
@@ -142,6 +152,7 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         public MapInstance(int id)
         {
+            m_playerCommands = new Queue<Action>();
             m_stateSnapshots = new Queue<PrivateWorldStateSnapshot>();
             m_gameObjects = new Dictionary<int, GameObject>();
             m_physicsWorld = Context.ActorOf(PhysicsWorldInstance.Create(), "physics-world");
@@ -162,12 +173,14 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(PhysicsWorldInstance.TickDone message)
         {
-            // TODO: process client commands
-            
+            while (m_playerCommands.Count > 0)
+                m_playerCommands.Dequeue()();
+
+            // TODO: process client commands            
             TakeSnapshotIfRequired(message.GameTime);
 
-            // tick back
-            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(message.Delta), Sender, PhysicsWorldInstance.Tick.Instance, Self);
+            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(10), Sender, PhysicsWorldInstance.Tick.Instance, Self);
+            //Sender.Tell(PhysicsWorldInstance.Tick.Instance);   
         }
 
         /// <summary>
@@ -321,9 +334,12 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(MovementCommand message)
         {
-            var mv = message.GameObj as MovableEntity;
-            mv.SetMovementSpeed(message.X * 10, message.Y * 10);            
-            Logger.Info("movement command : " + message.X);
+            m_playerCommands.Enqueue(() =>
+            {
+                var mv = message.GameObj as MovableEntity;
+                mv.SetMovementSpeed(message.X * 10, message.Y * 10);
+                Logger.Info("movement command : " + message.X);
+            });
         }
     }
 }
