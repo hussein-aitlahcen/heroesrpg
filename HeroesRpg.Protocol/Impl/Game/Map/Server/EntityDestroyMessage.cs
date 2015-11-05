@@ -1,5 +1,4 @@
-﻿using HeroesRpg.Protocol.Enum;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +8,8 @@ using System.Threading.Tasks;
 namespace HeroesRpg.Protocol.Impl.Game.Map.Server
 {
     [ProtoContract(ImplicitFields = ImplicitFields.AllPublic)]
-    public sealed class EntitySpawMessage : NetMessage
+    public sealed class EntityDestroyMessage : NetMessage
     {
-        public EntityTypeEnum Type { get; set; }
-        public int SubType { get; set; }
-        public byte[] EntityData { get; set; }
+        public int ObjectId { get; set; }
     }
 }

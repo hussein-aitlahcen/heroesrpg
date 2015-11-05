@@ -91,6 +91,7 @@
     <Compile Include="Game\World\Entity\Impl\EntityFactory.cs" />
     <Compile Include="Game\World\Entity\Impl\Ground.cs" />
     <Compile Include="Game\World\Entity\Impl\Hero.cs" />
+    <Compile Include="Game\World\Entity\Impl\Projectile.cs" />
     <Compile Include="Game\World\Entity\Impl\UnknowHeroBreedException.cs" />
     <Compile Include="Game\World\Entity\CombatEntity.cs" />
     <Compile Include="Game\World\Entity\EntityDecoration.cs" />

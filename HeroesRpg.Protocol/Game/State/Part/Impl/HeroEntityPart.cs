@@ -24,13 +24,15 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         }
 
         public int HeroId { get; private set; }
+        public int HeroType { get; private set; }
         public string PlayerName { get; private set; }
 
         public HeroEntityPart() { }
 
-        public HeroEntityPart(int heroId, string playerName)
+        public HeroEntityPart(int heroId, int heroType, string playerName)
         {
             HeroId = heroId;
+            HeroType = heroType;
             PlayerName = playerName;
         }
 
@@ -41,6 +43,7 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         public override void FromNetwork(BinaryReader reader)
         {
             HeroId = reader.ReadInt32();
+            HeroType = reader.ReadInt32();
             PlayerName = reader.ReadString();
         }
 
@@ -51,6 +54,7 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         public override void ToNetwork(BinaryWriter writer)
         {
             writer.Write(HeroId);
+            writer.Write(HeroType);
             writer.Write(PlayerName);
         }
     }

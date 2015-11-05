@@ -14,8 +14,6 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
     /// </summary>
     public sealed class Ground : StaticEntity
     {
-        public int Width { get; private set; }
-        public int Height { get; private set; }
         public CCDrawNode GroundSprite { get; private set; }
 
         /// <summary>
@@ -33,21 +31,9 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(GetPointToMeter(Width / 2f), GetPointToMeter(Height / 2f));
-            ContentSize = new CCSize(Width, Height);
-            GroundSprite.DrawRect(new CCRect(0, 0, Width, GetMeterToPoint(Height)), CCColor4B.Black);
+            shape.SetAsBox(PhysicWidth / 2f, PhysicHeight / 2f);
+            GroundSprite.DrawRect(new CCRect(0, 0,  Width, Height), CCColor4B.Black);
             return shape;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        public override void FromNetwork(BinaryReader reader)
-        {
-            base.FromNetwork(reader);
-            Width = reader.ReadInt32();
-            Height = reader.ReadInt32();
         }
     }
 }

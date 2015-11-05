@@ -17,6 +17,11 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <summary>
         /// 
         /// </summary>
+        public override int SubType => (int)HeroType;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public DragonBallHero() : base(HeroTypeEnum.DRAGON_BALL)
         {
         }

@@ -20,6 +20,9 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
             }
         }
         
+        public bool Bullet { get; private set; }
+        public float GravityScale { get; private set; }
+        public float LinearDamping { get; private set; }
         public float Mass { get; private set; }
         public float Density { get; private set; }
         public float Friction { get; private set; }
@@ -42,8 +45,11 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <param name="density"></param>
         /// <param name="friction"></param>
         /// <param name="fixedRotation"></param>
-        public PhysicObjectPart(float mass, float density, float friction, bool fixedRotation)
+        public PhysicObjectPart(bool bullet, float gravityScale, float linearDamping, float mass, float density, float friction, bool fixedRotation)
         {
+            Bullet = bullet;
+            GravityScale = gravityScale;
+            LinearDamping = linearDamping;
             Mass = mass;
             Density = density;
             Friction = friction;
@@ -56,6 +62,9 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <param name="reader"></param>
         public override void FromNetwork(BinaryReader reader)
         {
+            Bullet = reader.ReadBoolean();
+            GravityScale = reader.ReadSingle();
+            LinearDamping = reader.ReadSingle();
             Mass = reader.ReadSingle();
             Density = reader.ReadSingle();
             Friction = reader.ReadSingle();
@@ -68,6 +77,9 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <param name="writer"></param>
         public override void ToNetwork(BinaryWriter writer)
         {
+            writer.Write(Bullet);
+            writer.Write(GravityScale);
+            writer.Write(LinearDamping);
             writer.Write(Mass);
             writer.Write(Density);
             writer.Write(Friction);

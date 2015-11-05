@@ -164,9 +164,6 @@ namespace HeroesRpg.Client.Game.World
         /// <param name="gameObj"></param>
         public bool AddGameObject(GameObject gameObj)
         {
-            if(gameObj.IsLocal)
-                WorldManager.Instance.LocalPlayer = gameObj as Hero;
-
             if (!m_gameObjects.ContainsKey(gameObj.Id))
             {
                 gameObj.CreatePhysicsBody(World, PtmRatio);
@@ -190,6 +187,7 @@ namespace HeroesRpg.Client.Game.World
             {
                 var obj = m_gameObjects[id];
                 World.DestroyBody(obj.PhysicsBody);
+                obj.Dispose();
                 return true;
             }
             return false;

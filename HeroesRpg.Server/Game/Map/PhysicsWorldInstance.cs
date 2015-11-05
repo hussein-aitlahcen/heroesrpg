@@ -3,6 +3,7 @@ using Akka.Event;
 using Box2D.Collision.Shapes;
 using Box2D.Common;
 using Box2D.Dynamics;
+using HeroesRpg.Common;
 using HeroesRpg.Common.Generic;
 using HeroesRpg.Protocol.Game.State;
 using HeroesRpg.Server.Game.Entity;
@@ -139,22 +140,7 @@ namespace HeroesRpg.Server.Game.Map
         /// 
         /// </summary>
         private readonly ILoggingAdapter m_log = Logging.GetLogger(Context);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float TICK_RATE = 1.0f / 60.0f;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float SCHEDULER_DELAY = 10;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float TICK_MS = TICK_RATE * 1000;
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -230,7 +216,6 @@ namespace HeroesRpg.Server.Game.Map
             m_ptmRatio = ptm;
 
             InitPhysics();
-            InitGround();
         }
 
         /// <summary>
@@ -238,7 +223,7 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         public override void AroundPreStart()
         {
-            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(TICK_RATE), Self, new Tick(), Self);
+            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(0), Self, new Tick(), Self);
         }
         
         /// <summary>
@@ -247,13 +232,6 @@ namespace HeroesRpg.Server.Game.Map
         private void InitPhysics()
         {
             m_world = new b2World(new b2Vec2(m_gravityX, m_gravityY));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void InitGround()
-        {
         }
 
         /// <summary>
@@ -296,7 +274,7 @@ namespace HeroesRpg.Server.Game.Map
 
             var end = m_updateWatch.ElapsedMilliseconds;
             var updateTime = end - begin;
-            var updateLagged = updateTime > TICK_MS;
+            var updateLagged = updateTime > Constant.TICK_RATE_MS;
             if(updateLagged)
                 m_log.Info("physics world update lagged : " + updateTime);
 

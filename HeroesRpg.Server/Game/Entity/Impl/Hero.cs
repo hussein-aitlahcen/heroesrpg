@@ -64,6 +64,8 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         public Hero(HeroTypeEnum type)
         {
             PlayerName = "[???]";
+
+            SetNetworkType(GameObjectNetworkType.SHARE_FULL);
         }
 
         /// <summary>
@@ -82,7 +84,7 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(GetPointToMeter(55 / 2), GetPointToMeter(90 / 2));
+            shape.SetAsBox(PhysicWidth / 2, PhysicHeight / 2);
             return shape;
         }
 
@@ -92,22 +94,20 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <param name="reader"></param>
         public override void ToNetwork(BinaryWriter writer)
         {
-            // header
-            writer.Write((byte)HeroType);
             base.ToNetwork(writer);
-            ToNetworkHeroPart(writer);
+            CreateHeroNetworkPart().ToNetwork(writer);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="reader"></param>
-        public void ToNetworkHeroPart(BinaryWriter writer)
+        /// <param name="heroType"></param>
+        public virtual void SetHeroType(int heroType)
         {
-            writer.Write(HeroId);
-            writer.Write(PlayerName);
+            HeroType = (HeroTypeEnum)heroType;
+            OnHeroPartDirty();
         }
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -142,6 +142,7 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         public HeroEntityPart CreateHeroNetworkPart() =>
             new HeroEntityPart(
                 HeroId,
+                (int)HeroType,
                 PlayerName);
     }
 }

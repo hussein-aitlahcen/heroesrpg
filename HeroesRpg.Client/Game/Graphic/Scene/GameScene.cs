@@ -70,6 +70,10 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
                     MovementX++;
                     SendMovementRequest();
                     break;
+
+                case CCKeys.A:
+                    SendSpellUseRequest();
+                    break;
             }            
         }
 
@@ -92,6 +96,14 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
                     SendMovementRequest();
                     break;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SendSpellUseRequest()
+        {
+            GameClient.Instance.Send(new PlayerUseSpellRequestMessage() { SpellId = 0, Angle = 0 });
         }
 
         /// <summary>

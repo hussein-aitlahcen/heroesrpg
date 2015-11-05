@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,13 +11,8 @@ namespace HeroesRpg.Server.Game.Entity.Impl
     /// <summary>
     /// 
     /// </summary>
-    public sealed class Ground : StaticEntity
+    public sealed class Projectile : AnimatedEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public override EntityTypeEnum Type => EntityTypeEnum.GROUND;
-
         /// <summary>
         /// 
         /// </summary>
@@ -27,7 +21,12 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <summary>
         /// 
         /// </summary>
-        public Ground()
+        public override EntityTypeEnum Type => EntityTypeEnum.PROJECTILE;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Projectile()
         {
             SetNetworkType(GameObjectNetworkType.SHARE_CREATION_DELETION);
         }
@@ -35,9 +34,10 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <summary>
         /// 
         /// </summary>
-        protected override void InitializeNetworkParts()
+        public override void Update()
         {
-            base.InitializeNetworkParts();
+            base.Update();
+            IsRemovable = WorldPositionX > 1024 || WorldPositionX < 0;
         }
 
         /// <summary>

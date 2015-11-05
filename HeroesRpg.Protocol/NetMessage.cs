@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg.Protocol
 {
+    [ProtoInclude(1020, typeof(EntityDestroyMessage))]
+    [ProtoInclude(1019, typeof(PlayerJumpRequestMessage))]
+    [ProtoInclude(1018, typeof(PlayerUseSpellRequestMessage))]
     [ProtoInclude(1017, typeof(ClientControlledObjectMessage))]
     [ProtoInclude(1016, typeof(PlayerMovementRequestMessage))]
     [ProtoInclude(1015, typeof(WorldStateSnapshotMessage))]

@@ -26,6 +26,8 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         public int Id { get; private set; }
         public float PositionX { get; private set; }
         public float PositionY { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         /// <summary>
         /// 
@@ -44,11 +46,13 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
         /// <param name="density"></param>
         /// <param name="friction"></param>
         /// <param name="fixedRotation"></param>
-        public GameObjectPart(int id, float positionX, float positionY)
+        public GameObjectPart(int id, float positionX, float positionY, int width, int height)
         {
             Id = id;
             PositionX = positionX;
             PositionY = positionY;
+            Width = width;
+            Height = height;
         }
 
         /// <summary>
@@ -60,6 +64,8 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
             Id = reader.ReadInt32();
             PositionX = reader.ReadSingle();
             PositionY = reader.ReadSingle();
+            Width = reader.ReadInt32();
+            Height = reader.ReadInt32();
         }
 
         /// <summary>
@@ -71,6 +77,8 @@ namespace HeroesRpg.Protocol.Game.State.Part.Impl
             writer.Write(Id);
             writer.Write(PositionX);
             writer.Write(PositionY);
+            writer.Write(Width);
+            writer.Write(Height);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using HeroesRpg.Client.Game.World.Entity;
 using HeroesRpg.Client.Game.World.Entity.Impl;
+using HeroesRpg.Common;
 using HeroesRpg.Common.Generic;
+using HeroesRpg.Common.Util;
 using HeroesRpg.Protocol.Game.State;
 using log4net;
 using System;
@@ -19,12 +21,12 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
-        public const int MIN_SNAP_BUFFER = 2;
+        public static int MIN_SNAP_BUFFER = (int)Math.Floor(CL_INTERPOLATION / Constant.UPDATE_RATE_SECOND);
 
         /// <summary>
         /// 
         /// </summary>
-        public const int CL_INTERPOLATION = MIN_SNAP_BUFFER;
+        public const float CL_INTERPOLATION = 0.1f;
 
         /// <summary>
         /// 
@@ -69,15 +71,14 @@ namespace HeroesRpg.Client.Game.World
         /// </summary>
         public Hero LocalPlayer
         {
-            get;
-            set;
+            get
+            {
+                if (ControlledObjectId == -1)
+                    return null;
+                return MapInstance.Instance.GetGameObject(ControlledObjectId) as Hero;
+            }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private bool m_localSnapNeeded;
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -96,14 +97,13 @@ namespace HeroesRpg.Client.Game.World
             m_localSnapshots.Clear();
             m_stateSnapshots.Clear();
             m_gameTime = -1;
-            m_localSnapNeeded = false;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public bool IsSnapshotBuffered() => m_stateSnapshots.Count > MIN_SNAP_BUFFER;
+        public bool IsSnapshotBuffered() => m_stateSnapshots.Count >= MIN_SNAP_BUFFER;
 
         /// <summary>
         /// 
@@ -126,16 +126,10 @@ namespace HeroesRpg.Client.Game.World
             var diffX = Math.Abs(InterpolationState.PositionX - nextX);
             var diffY = Math.Abs(InterpolationState.PositionY - nextY);
             var diffTime = GameTime - InterpolationState.GameTime;
-            
-            return 
-                ((InterpolationState.PositionX > nextX && InterpolationState.VelocityX > 0 || 
-                InterpolationState.PositionX < nextX && InterpolationState.VelocityX < 0) 
-                && 
-                (InterpolationState.PositionY > nextY && InterpolationState.VelocityY > 0 || 
-                InterpolationState.PositionY < nextY && InterpolationState.VelocityY < 0))                
-                ||
-                (diffX <= MovableEntity.INTERPOLATION_MIN_DELTA &&
-                diffY <= MovableEntity.INTERPOLATION_MIN_DELTA);
+                        
+            return
+                (diffX <= 1 &&
+                diffY <= 1 );
         }
 
         /// <summary>
@@ -160,19 +154,16 @@ namespace HeroesRpg.Client.Game.World
         /// 
         /// </summary>
         /// <param name="snapShot"></param>
-        public void AddLocalStateSnapshot(float x, float y, float vX, float vY)
+        public void AddLocalStateSnapshot()
         {
-            if (m_localSnapNeeded)
+            if (LocalPlayer != null)
             {
-                m_localSnapNeeded = false;
                 m_localSnapshots.Enqueue(new LocalStateSnapshot(
-                    GameTime,
-                    x,
-                    y,
-                    vX,
-                    vY));
-                if (m_localSnapshots.Count > MIN_SNAP_BUFFER)
-                    InterpolationState = m_localSnapshots.Dequeue();
+                    Time.TotalMilliseconds + (long)(CL_INTERPOLATION * 1000),
+                    LocalPlayer.PhysicPositionX,
+                    LocalPlayer.PhysicPositionY,
+                    LocalPlayer.VelocityX,
+                    LocalPlayer.VelocityY));
             }
         }
 
@@ -184,9 +175,9 @@ namespace HeroesRpg.Client.Game.World
         {
             if (snapShot.GameTime >= m_gameTime)
             {
-                m_localSnapNeeded = true;
                 m_gameTime = snapShot.GameTime;
                 m_stateSnapshots.Enqueue(snapShot);
+                AddLocalStateSnapshot();
             }
             else
             {
@@ -198,9 +189,14 @@ namespace HeroesRpg.Client.Game.World
         /// 
         /// </summary>
         public void UpdateEntities()
-        {            
-            if(IsSnapshotBuffered())
-                MapInstance.Instance.UpdateEntities(m_stateSnapshots.Dequeue());            
+        {
+            if (IsSnapshotBuffered())
+            {
+                var worldState = m_stateSnapshots.Dequeue();
+                if (m_localSnapshots.Count > MIN_SNAP_BUFFER + 1)
+                    InterpolationState = m_localSnapshots.Dequeue();
+                MapInstance.Instance.UpdateEntities(worldState);
+            }           
         }
     }
 }

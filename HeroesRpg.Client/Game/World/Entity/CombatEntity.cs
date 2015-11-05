@@ -88,17 +88,10 @@ namespace HeroesRpg.Client.Game.World.Entity
         public override void FromNetwork(BinaryReader reader)
         {
             base.FromNetwork(reader);
-            UpdateCombatEntityNetwork(reader);
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        public void UpdateCombatEntityNetwork(BinaryReader reader)
-        {
-            MaxLife = reader.ReadInt32();
-            CurrentLife = reader.ReadInt32();
+            var combatPart = new CombatEntityPart();
+            combatPart.FromNetwork(reader);
+            UpdateCombatEntityPart(combatPart);
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ namespace HeroesRpg.Client.Game.World.Entity
     /// <summary>
     /// Base class of all game objects
     /// </summary>
-    public abstract class GameObject : CCSprite
+    public abstract class GameObject : CCSprite, IDisposable
     {
         /// <summary>
         /// 
@@ -87,6 +87,33 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        public bool Bullet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float GravityScale
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float LinearDamping
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public float Mass
         {
             get;
@@ -110,6 +137,54 @@ namespace HeroesRpg.Client.Game.World.Entity
             get;
             private set;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Width
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int Height
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float WorldPositionX => GetMeterToPoint(PhysicPositionX);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float WorldPositionY => GetMeterToPoint(PhysicPositionY);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float PhysicPositionX => PhysicsBody == null ? InitialPosition.x : PhysicsBody.Position.x;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float PhysicPositionY => PhysicsBody == null ? InitialPosition.y : PhysicsBody.Position.y;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float PhysicWidth => GetPointToMeter(Width);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float PhysicHeight => GetPointToMeter(Height);
 
         /// <summary>
         /// 
@@ -173,9 +248,13 @@ namespace HeroesRpg.Client.Game.World.Entity
             PhysicsBodyDef.position = InitialPosition;
             PhysicsBodyDef.type = BodyType;
             PhysicsBodyDef.fixedRotation = FixedRotation;
+            PhysicsBodyDef.gravityScale = GravityScale;
+            PhysicsBodyDef.linearDamping = LinearDamping;
+            PhysicsBodyDef.bullet = Bullet;
 
             PhysicsBody = world.CreateBody(PhysicsBodyDef);
 
+            PhysicsBody.Mass = Mass;
             PhysicsBody.ResetMassData();
 
             var fixtureDef = new b2FixtureDef();
@@ -273,19 +352,55 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="linearDamping"></param>
+        public void SetLinearDamping(float linearDamping)
+        {
+            LinearDamping = linearDamping;
+            if(PhysicsBody != null)
+            {
+                PhysicsBody.LinearDamping = linearDamping;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bullet"></param>
+        public void SetBullet(bool bullet)
+        {
+            Bullet = bullet;
+            if (PhysicsBody != null)
+            {
+                PhysicsBody.SetBullet(bullet);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gravityScale"></param>
+        public void SetGravityScale(float gravityScale)
+        {
+            GravityScale = gravityScale;
+            if(PhysicsBody != null)
+            {
+                PhysicsBody.GravityScale = gravityScale;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="reader"></param>
         public virtual void FromNetwork(BinaryReader reader)
         {
-            Id = reader.ReadInt32();
-            var x = reader.ReadSingle();
-            var y = reader.ReadSingle();
-            PositionX = GetMeterToPoint(x);
-            PositionY = GetMeterToPoint(y);
-            SetPhysicsPosition(x, y);
-            Mass = reader.ReadSingle();
-            Density = reader.ReadSingle();
-            Friction = reader.ReadSingle();
-            FixedRotation = reader.ReadBoolean();
+            var gameObjPart = new GameObjectPart();
+            gameObjPart.FromNetwork(reader);
+            UpdateGameObjectPart(gameObjPart);
+
+            var physicPart = new PhysicObjectPart();
+            physicPart.FromNetwork(reader);
+            UpdatePhysicPart(physicPart);
         }
 
         /// <summary>
@@ -296,6 +411,8 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             Id = part.Id;
             SetPhysicsPosition(part.PositionX, part.PositionY);
+            SetWidth(part.Width);
+            SetHeight(part.Height);
         }
 
         /// <summary>
@@ -308,6 +425,9 @@ namespace HeroesRpg.Client.Game.World.Entity
             SetFriction(part.Friction);
             SetDensity(part.Density);
             SetFixedRotation(part.FixedRotation);
+            SetLinearDamping(part.LinearDamping);
+            SetGravityScale(part.GravityScale);
+            SetBullet(part.Bullet);
         }
 
         /// <summary>
@@ -327,6 +447,24 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="width"></param>
+        public void SetWidth(int width)
+        {
+            Width = width;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="height"></param>
+        public void SetHeight(int height)
+        {
+            Height = height;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void SetPhysicsPosition(float x, float y)
@@ -339,6 +477,14 @@ namespace HeroesRpg.Client.Game.World.Entity
                     PhysicsBody.SetTransform(new b2Vec2(x, y), PhysicsBody.Angle);
                 }
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual new void Dispose()
+        {
+            base.Dispose();
         }
     }
 }

@@ -9,6 +9,7 @@ using HeroesRpg.Protocol.Game.State.Part;
 using HeroesRpg.Protocol.Game.State.Part.Impl;
 using Box2D.Dynamics;
 using CocosSharp;
+using HeroesRpg.Common;
 
 namespace HeroesRpg.Client.Game.World.Entity
 {
@@ -17,21 +18,6 @@ namespace HeroesRpg.Client.Game.World.Entity
     /// </summary>
     public abstract class MovableEntity : DecoratedEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public const int INTERPOLATION_MIN_DELTA = 20;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float INTERPOLATION_CONSTANT = 1 / 40f;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float STEP_INTERPOLATION = INTERPOLATION_CONSTANT / 5;
-
         /// <summary>
         /// 
         /// </summary>
@@ -49,6 +35,16 @@ namespace HeroesRpg.Client.Game.World.Entity
             get;
             private set;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float VelocityX => PhysicsBody == null ? InitialVelocityX : PhysicsBody.LinearVelocity.x;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float VelocityY => PhysicsBody == null ? InitialVelocityY : PhysicsBody.LinearVelocity.y;
 
         /// <summary>
         /// 
@@ -143,13 +139,11 @@ namespace HeroesRpg.Client.Game.World.Entity
                 if (IsPositionCorrection)
                 {
                     var diffTime = CorrectionTime - UpdateTime;
-                    var ratio = 1 - (diffTime / INTERPOLATION_CONSTANT);
+                    var ratio = 1 - (diffTime / Constant.UPDATE_RATE_SECOND);
                     var interpolation = CCPoint.Lerp(new CCPoint(PhysicsBody.Position.x, PhysicsBody.Position.y), new CCPoint(CorrectionX, CorrectionY), ratio);
+
                     PhysicsBody.SetTransform(new b2Vec2(interpolation.X, interpolation.Y), PhysicsBody.Angle);
                 }
-
-                if (IsLocal)
-                    WorldManager.Instance.AddLocalStateSnapshot(PositionX, PositionY, PhysicsBody.LinearVelocity.x, PhysicsBody.LinearVelocity.y);
             }
         }
 
@@ -177,7 +171,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             Ghost.Cleanup();
             Ghost.PositionX = PositionX;
             Ghost.PositionY = PositionY;
-            Ghost.DrawRect(new CCRect(0, 0,  55, 85), new CCColor4B(0, 0, 0, 50));
+            Ghost.DrawRect(new CCRect(0, 0,  Width, Height), new CCColor4B(0, 0, 0, 50));
         }
 
         /// <summary>
@@ -261,34 +255,29 @@ namespace HeroesRpg.Client.Game.World.Entity
             {
                 var worldX = GetMeterToPoint(nextX);
                 var worldY = GetMeterToPoint(nextY);
-                var realDiffX = worldX - PositionX;
-                var realDiffY = worldY - PositionY;
+                var realDiffX = PositionX - worldX;
+                var realDiffY = PositionY - worldY;
                 var diffX = Math.Abs(worldX - PositionX);
                 var diffY = Math.Abs(worldY - PositionY);
 
-                if ((diffX > INTERPOLATION_MIN_DELTA || diffY > INTERPOLATION_MIN_DELTA)
-                    ||
-                    (PhysicsBody.LinearVelocity.x == 0f && PhysicsBody.LinearVelocity.y == 0f &&
-                    (diffX > INTERPOLATION_MIN_DELTA / 4 || diffY > INTERPOLATION_MIN_DELTA / 4)))
+                if (IsLocal)
                 {
-                    if (IsLocal && WorldManager.Instance.IsPositionInterpolationValid(worldX, worldY))
-                    {
+                    if (WorldManager.Instance.IsPositionInterpolationValid(nextX, nextY))                    
                         return;
-                    }
-                    if (realDiffX > 0 && MovementSpeedX <= 0
-                        || realDiffX < 0 && MovementSpeedX >= 0
-                        || realDiffY > 0 && MovementSpeedY <= 0
-                        || realDiffY < 0 && MovementSpeedY >= 0)
-                    {
-                        if (diffX > INTERPOLATION_MIN_DELTA)
-                            nextX += GetPointToMeter(realDiffX > 0 ? -INTERPOLATION_MIN_DELTA : +INTERPOLATION_MIN_DELTA);
-                        if (diffY > INTERPOLATION_MIN_DELTA)
-                            nextY += GetPointToMeter(realDiffX > 0 ? -INTERPOLATION_MIN_DELTA : +INTERPOLATION_MIN_DELTA);
 
-                        CorrectionX = nextX;
-                        CorrectionY = nextY;
-                        CorrectionTime = UpdateTime + INTERPOLATION_CONSTANT;
-                    }
+                    if (realDiffX > 0 && MovementSpeedX > 0)
+                        nextX = nextX + realDiffX / 2;
+                    if(realDiffY > 0 && MovementSpeedY > 0)
+                        nextY = nextY + realDiffY / 2;
+                    CorrectionX = nextX;
+                    CorrectionY = nextY;
+                    CorrectionTime = UpdateTime + Constant.UPDATE_RATE_SECOND;
+                }
+                else
+                {
+                    CorrectionX = nextX;
+                    CorrectionY = nextY;
+                    CorrectionTime = UpdateTime + Constant.UPDATE_RATE_SECOND;
                 }
             }
         }
@@ -300,17 +289,10 @@ namespace HeroesRpg.Client.Game.World.Entity
         public override void FromNetwork(BinaryReader reader)
         {
             base.FromNetwork(reader);
-            UpdateMovableEntityData(reader);
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        public void UpdateMovableEntityData(BinaryReader reader)
-        {
-            InitialVelocityX = reader.ReadSingle();
-            InitialVelocityY = reader.ReadSingle();
+            var movablePart = new MovableEntityPart();
+            movablePart.FromNetwork(reader);
+            UpdateMovableEntityPart(movablePart);
         }
 
         /// <summary>
@@ -319,6 +301,8 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="part"></param>
         public void UpdateMovableEntityPart(MovableEntityPart part)
         {
+            InitialVelocityX = part.VelocityX;
+            InitialVelocityY = part.VelocityY;
             if(!IsLocal)
                 SetVelocityInterpolation(part.VelocityX, part.VelocityY);
             SetPositionInterpolation(part.X, part.Y);
@@ -336,6 +320,17 @@ namespace HeroesRpg.Client.Game.World.Entity
             var movablePart = parts.FirstOrDefault(part => part.Type == StatePartTypeEnum.MOVABLE_ENTITY);
             if (movablePart != null)
                 UpdateMovableEntityPart(movablePart as MovableEntityPart);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public override void Dispose()
+        {
+            base.Dispose();
+
+            Ghost.RemoveFromParent(true);
+            Ghost.Dispose();
         }
     }
 }
