@@ -87,8 +87,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
         /// <returns></returns>
         public bool ProcessMessage(NetMessage message)
         {
-            var processed = false;
-            message.Match()
+            return message.Match()
                 .With<PhysicsWorldDataMessage>((physics) =>
                 {
                     MapInstance.Instance.Initialize(
@@ -98,7 +97,6 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                         physics.VelocityIte,
                         physics.PositionIte);
                     Logger.Debug("Physics data received");
-                    processed = true;
                 })
                 .With<ClientControlledObjectMessage>((m) =>
                 {
@@ -120,7 +118,6 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                             animated.StartAnimation(Animation.STAND);
                         }                     
                     }
-                    processed = true;
                 })
                 .With<WorldStateSnapshotMessage>((m) =>
                 {
@@ -133,8 +130,8 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                         }
                     }
                     WorldManager.Instance.AddWorldStateSnapshot(snapshot);
-                });
-            return processed;
+                })
+                .Matched;
         }
     }
 }

@@ -25,6 +25,11 @@ namespace HeroesRpg.Common.Generic
         /// <summary>
         /// 
         /// </summary>
+        public bool Matched => m_matched;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="obj"></param>
         public Matcher(T obj)
         {

@@ -37,7 +37,7 @@ namespace HeroesRpg.Client
             // CCSceneResolutionPolicy.ShowAll will ensure that the aspect ratio is preserved
             CCScene.SetDefaultDesignResolution(desiredWidth, desiredHeight, CCSceneResolutionPolicy.ShowAll);
 
-            mainWindow.AllowUserResizing = false;
+            mainWindow.AllowUserResizing = true;
             //mainWindow.AllowUserResizing = false;
 
             //// Determine whether to use the high or low def versions of our images
@@ -56,6 +56,8 @@ namespace HeroesRpg.Client
 
             // Poll incomming messages
             SharedApplication.Scheduler.Schedule(GameClient.Instance, 0, false);
+
+            application.AnimationInterval = 1 / 120.0f;
 
             ResourceDictionary.DefaultDictionary = Light.GetThemeDictionary();
             SpriteFont font = CCContentManager.SharedContentManager.Load<SpriteFont>("fonts/Segoe_UI_10_Regular");
