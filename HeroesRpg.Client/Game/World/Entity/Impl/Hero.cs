@@ -96,21 +96,11 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         {
             PlayerName = "PlaceHolder";
             PlayerNameColor = CCColor3B.Black;
+            HeroType = type;
 
             AddDecoration(PlayerNameDecoration = new NameDecoration(() => PlayerName, () => PlayerNameColor));
         }
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <returns></returns>
-        //public override b2Shape CreatePhysicsShape()
-        //{
-        //    var shape = new b2PolygonShape();
-        //    shape.SetAsBox(ScaledContentSize.Width / 2 / PtmRatio, ScaledContentSize.Height / 2 / PtmRatio);
-        //    return shape;
-        //}
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -118,7 +108,7 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         public override b2Shape CreatePhysicsShape()
         {
             var shape = new b2PolygonShape();
-            shape.SetAsBox(GetPointToMeter(55 / 2), GetPointToMeter(85 / 2));
+            shape.SetAsBox(PhysicWidth / 2, PhysicHeight / 2);
             return shape;
         }
 
@@ -129,22 +119,20 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         public override void FromNetwork(BinaryReader reader)
         {
             base.FromNetwork(reader);
-            UpdateHeroData(reader);
-        }
 
+            var heroPart = new HeroEntityPart();
+            heroPart.FromNetwork(reader);
+            UpdateHeroPart(heroPart);
+        }
+        
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="reader"></param>
-        public void UpdateHeroData(BinaryReader reader)
-        {
-            SetHeroId(reader.ReadInt32());
-            SetPlayerName(reader.ReadString());
-        }
-        
+        /// <param name="part"></param>
         public void UpdateHeroPart(HeroEntityPart part)
         {
             SetHeroId(part.HeroId);
+            SetHeroType(part.HeroType);
             SetPlayerName(part.PlayerName);
         }
 
@@ -158,6 +146,15 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
             var heroPart = parts.FirstOrDefault(part => part.Type == StatePartTypeEnum.HERO_ENTITY);
             if (heroPart != null)
                 UpdateHeroPart(heroPart as HeroEntityPart);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="heroType"></param>
+        public virtual void SetHeroType(int heroType)
+        {
+            HeroType = (HeroTypeEnum)heroType;
         }
 
         /// <summary>

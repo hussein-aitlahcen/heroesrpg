@@ -32,7 +32,7 @@ namespace HeroesRpg.Client
             var desiredHeight = 768.0f;
 
             CocosSharpEngine engine = new CocosSharpEngine(application.GraphicsDevice, (int)desiredWidth, (int)desiredHeight);
-            
+
             // This will set the world bounds to be (0,0, w, h)
             // CCSceneResolutionPolicy.ShowAll will ensure that the aspect ratio is preserved
             CCScene.SetDefaultDesignResolution(desiredWidth, desiredHeight, CCSceneResolutionPolicy.ShowAll);

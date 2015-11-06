@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HeroesRpg
 {
-    public static class ObjectExtesions
+    public static class ObjectExtensions
     {
         public static Matcher<T> Match<T>(this T obj) where T : class => new Matcher<T>(obj);
     }

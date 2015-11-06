@@ -29,11 +29,13 @@ namespace HeroesRpg.Server.Game.Handler.Impl
             var testObj = new DragonBallHero();
             testObj.SetPlayerName(message.Client.ClientId.ToString());
             testObj.SetId((int)message.Client.ClientId);
-            testObj.SetFixedRotation(true);
             testObj.SetControllerId(message.Client.ClientId);
             testObj.SetHeroId((int)DragonBallHeroEnum.BROLY);
             testObj.SetWorldPosition(200, 200);
             testObj.SetCurrentLife(1000);
+            testObj.SetWidth(55);
+            testObj.SetHeight(90);
+            testObj.SetLinearDamping(5f);
 
             message.Client.ControlledObject = testObj;
             message.Client.Send(new ClientControlledObjectMessage() { ObjectId = testObj.Id });

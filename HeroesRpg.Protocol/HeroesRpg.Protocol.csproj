@@ -70,8 +70,11 @@
     <Compile Include="Impl\Connection\Server\ClientVersionRequired.cs" />
     <Compile Include="Impl\Connection\Server\IdentificationResultMessage.cs" />
     <Compile Include="Impl\Connection\Server\WelcomeConnectMessage.cs" />
+    <Compile Include="Impl\Game\Command\Client\PlayerJumpRequestMessage.cs" />
     <Compile Include="Impl\Game\Command\Client\PlayerMovementRequestMessage.cs" />
+    <Compile Include="Impl\Game\Command\Client\PlayerUseSpellRequestMessage.cs" />
     <Compile Include="Impl\Game\Map\Client\PhysicsWorldDataRequestMessage.cs" />
+    <Compile Include="Impl\Game\Map\Server\EntityDestroyMessage.cs" />
     <Compile Include="Impl\Game\Map\Server\EntitySpawMessage.cs" />
     <Compile Include="Impl\Game\Map\Server\PhysicsWorldDataMessage.cs" />
     <Compile Include="Impl\Game\World\Server\ClientControlledObjectMessage.cs" />

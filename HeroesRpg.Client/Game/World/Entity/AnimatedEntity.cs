@@ -61,8 +61,12 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <param name="animation"></param>
         public virtual bool StartAnimation(Animation animation, bool repeat = true)
         {
+            if (SpriteSheet == null)
+                return false;
+
             if (CurrentAnimation == animation)
                 return false;
+
             CurrentAnimation = animation;
             
             var animationFrames = GetAnimationSprites(animation.RawSprite);
@@ -113,7 +117,6 @@ namespace HeroesRpg.Client.Game.World.Entity
         public override void FromNetwork(BinaryReader reader)
         {
             base.FromNetwork(reader);
-            UpdateAnimatedEntityData(reader);
         }
 
         /// <summary>

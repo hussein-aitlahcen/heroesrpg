@@ -89,8 +89,7 @@ namespace HeroesRpg.Server.Game.Entity
         public override void ToNetwork(BinaryWriter writer)
         {
             base.ToNetwork(writer);
-            writer.Write(MaxLife);
-            writer.Write(CurrentLife);
+            CreateCombatNetworkPart().ToNetwork(writer);
         }
 
         /// <summary>

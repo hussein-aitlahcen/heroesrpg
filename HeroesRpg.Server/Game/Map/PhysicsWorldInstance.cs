@@ -3,6 +3,7 @@ using Akka.Event;
 using Box2D.Collision.Shapes;
 using Box2D.Common;
 using Box2D.Dynamics;
+using HeroesRpg.Common;
 using HeroesRpg.Common.Generic;
 using HeroesRpg.Protocol.Game.State;
 using HeroesRpg.Server.Game.Entity;
@@ -39,34 +40,16 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        public sealed class TickDone : PhysicsWorldMessage
+        public sealed class TakeSnap : PhysicsWorldMessage
         {
-            /// <summary>
-            /// 
-            /// </summary>
-            public double Delta
-            {
-                get;
-                private set;
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public long GameTime
-            {
-                get;
-                private set;
-            }
-            
+            public long PhysicUpdateSequence { get; }
             /// <summary>
             /// 
             /// </summary>
             /// <param name="snap"></param>
-            public TickDone(double delta, long time)
+            public TakeSnap(long physicUpdateSequence)
             {
-                Delta = delta;
-                GameTime = time;
+                PhysicUpdateSequence = physicUpdateSequence;
             }
         }
 
@@ -139,22 +122,7 @@ namespace HeroesRpg.Server.Game.Map
         /// 
         /// </summary>
         private readonly ILoggingAdapter m_log = Logging.GetLogger(Context);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float TICK_RATE = 1.0f / 60.0f;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float SCHEDULER_DELAY = 10;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public const float TICK_MS = TICK_RATE * 1000;
-
+        
         /// <summary>
         /// 
         /// </summary>
@@ -198,13 +166,13 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        private long m_lastUpdate;
+        private long m_updateAcumulator;
 
         /// <summary>
         /// 
         /// </summary>
-        private long m_gameTime;
-
+        private long m_physicUpdateSequence;
+        
         /// <summary>
         /// 
         /// </summary>
@@ -218,11 +186,15 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
+        private List<GameObject> m_objects;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="ptm"></param>
         public PhysicsWorldInstance(float gravityX, float gravityY, int ptm)
         {
-            m_updateWatch = new Stopwatch();
-            m_updateWatch.Start();
+            m_objects = new List<GameObject>();
             m_objectToCreate = new List<GameObject>();
             m_objectToDestroy = new List<GameObject>();
             m_gravityX = gravityX;
@@ -230,7 +202,6 @@ namespace HeroesRpg.Server.Game.Map
             m_ptmRatio = ptm;
 
             InitPhysics();
-            InitGround();
         }
 
         /// <summary>
@@ -238,7 +209,9 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         public override void AroundPreStart()
         {
-            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(TICK_RATE), Self, new Tick(), Self);
+            m_updateWatch = Stopwatch.StartNew();
+
+            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(0), Self, new Tick(), Self);
         }
         
         /// <summary>
@@ -247,13 +220,6 @@ namespace HeroesRpg.Server.Game.Map
         private void InitPhysics()
         {
             m_world = new b2World(new b2Vec2(m_gravityX, m_gravityY));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void InitGround()
-        {
         }
 
         /// <summary>
@@ -287,29 +253,35 @@ namespace HeroesRpg.Server.Game.Map
         /// <param name="message"></param>
         public void Handle(Tick message)
         {
-            UpdateObjects();
+            CreateRemoveObjects();
 
-            var begin = m_updateWatch.ElapsedMilliseconds;
-            var delta = begin - m_lastUpdate;
+            m_updateAcumulator += m_updateWatch.ElapsedMilliseconds;
+            m_updateWatch.Restart();
 
-            UpdateWorld(delta * 0.001f);
+            while(m_updateAcumulator > Constant.TICK_RATE_MS)
+            {
+                UpdateBeforePhysics();
+                UpdateWorld(Constant.TICK_RATE + 0.00002f);
+                ++m_physicUpdateSequence;
+                m_updateAcumulator -= Constant.TICK_RATE_MS_LONG;
+            }
 
-            var end = m_updateWatch.ElapsedMilliseconds;
-            var updateTime = end - begin;
-            var updateLagged = updateTime > TICK_MS;
-            if(updateLagged)
-                m_log.Info("physics world update lagged : " + updateTime);
-
-            m_gameTime += delta;
-            m_lastUpdate = begin;
-
-            Context.Parent.Tell(new TickDone(delta, m_gameTime));
+            Context.Parent.Tell(new TakeSnap(m_physicUpdateSequence));
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateBeforePhysics()
+        {
+            foreach (var obj in m_objects)
+                obj.UpdateBeforePhysics();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void UpdateObjects()
+        private void CreateRemoveObjects()
         {
             var c = m_objectToCreate.Count;
             var d = m_objectToDestroy.Count;
@@ -320,12 +292,14 @@ namespace HeroesRpg.Server.Game.Map
                 {
                     var createObj = m_objectToCreate[i];
                     createObj.CreatePhysicsBody(m_world, m_ptmRatio);
+                    m_objects.Add(createObj);
                     Context.Parent.Tell(new EntityBodyCreated(createObj), ActorRefs.Nobody);
                 }
                 if (i < d)
                 {
                     var destroyObj = m_objectToDestroy[i];
                     m_world.DestroyBody(destroyObj.PhysicsBody);
+                    m_objects.Remove(destroyObj);
                     Context.Parent.Tell(new EntityBodyDestroyed(destroyObj), ActorRefs.Nobody);
                 }
             }

@@ -2,6 +2,7 @@
 using Box2D.Dynamics;
 using HeroesRpg.Client.Game.World.Entity;
 using HeroesRpg.Client.Game.World.Entity.Impl;
+using HeroesRpg.Common;
 using HeroesRpg.Common.Generic;
 using HeroesRpg.Protocol.Game.State;
 using System;
@@ -77,12 +78,37 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
-        private double m_lastUpdate;
+        private long m_updateAcumulator;
 
         /// <summary>
         /// 
         /// </summary>
+        private long m_physicUpdateSequence;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long ClientPhysicUpdateSequence
+        {
+            get
+            {
+                return m_physicUpdateSequence;
+            }
+            set
+            {
+                m_physicUpdateSequence = value;
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         private Dictionary<int, GameObject> m_gameObjects;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IEnumerable<GameObject> GameObjects => m_gameObjects.Values;
 
         /// <summary>
         /// 
@@ -130,17 +156,23 @@ namespace HeroesRpg.Client.Game.World
         {
             WorldManager.Instance.UpdateEntities();
 
-            var begin = m_updateWatch.Elapsed.TotalSeconds;
-            var delta = (float)(begin - m_lastUpdate);
-            m_lastUpdate = begin;
+            m_updateAcumulator += m_updateWatch.ElapsedMilliseconds;
+            m_updateWatch.Restart();
 
-            World.Step(delta, VelocityIterations, PositionIterations);
+            while(m_updateAcumulator >= Constant.TICK_RATE_MS)
+            {
+                UpdateEntitiesBeforePhysics(Constant.TICK_RATE);
+                World.Step(Constant.TICK_RATE, VelocityIterations, PositionIterations);
+
+                m_physicUpdateSequence++;
+                m_updateAcumulator -= Constant.TICK_RATE_MS_LONG;
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public void UpdateEntities(WorldStateSnapshot snapShot)
+        public void UpdateEntitiesFromNet(WorldStateSnapshot snapShot)
         {
             foreach(var state in snapShot.States)
             {
@@ -161,12 +193,20 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
+        public void UpdateEntitiesBeforePhysics(float delta)
+        {
+            foreach (var obj in m_gameObjects.Values)
+            {
+                obj.UpdateBeforePhysics(delta);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="gameObj"></param>
         public bool AddGameObject(GameObject gameObj)
         {
-            if(gameObj.IsLocal)
-                WorldManager.Instance.LocalPlayer = gameObj as Hero;
-
             if (!m_gameObjects.ContainsKey(gameObj.Id))
             {
                 gameObj.CreatePhysicsBody(World, PtmRatio);
@@ -190,6 +230,7 @@ namespace HeroesRpg.Client.Game.World
             {
                 var obj = m_gameObjects[id];
                 World.DestroyBody(obj.PhysicsBody);
+                obj.Dispose();
                 return true;
             }
             return false;

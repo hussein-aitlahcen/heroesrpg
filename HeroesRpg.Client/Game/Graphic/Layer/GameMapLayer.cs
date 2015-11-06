@@ -104,7 +104,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                 })
                 .With<EntitySpawMessage>((entitySpawn) =>
                 {
-                    var entity = EntityFactory.Instance.CreateFromNetwork(entitySpawn.Type, entitySpawn.EntityData);
+                    var entity = EntityFactory.Instance.CreateFromNetwork(entitySpawn.Type, entitySpawn.SubType, entitySpawn.EntityData);
                     if (entity != null)
                     {
                         AddGameObject(entity);
@@ -118,6 +118,10 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                             animated.StartAnimation(Animation.STAND);
                         }                     
                     }
+                })
+                .With<EntityDestroyMessage>(entityDestroyed =>
+                {
+                    MapInstance.Instance.RemoveGameObject(entityDestroyed.ObjectId);
                 })
                 .With<WorldStateSnapshotMessage>((m) =>
                 {

@@ -1,43 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Box2D.Collision.Shapes;
-using HeroesRpg.Protocol.Enum;
+using CocosSharp;
 
-namespace HeroesRpg.Server.Game.Entity.Impl
+namespace HeroesRpg.Client.Game.World.Entity.Impl
 {
     /// <summary>
     /// 
     /// </summary>
-    public sealed class Ground : StaticEntity
+    public sealed class Projectile : AnimatedEntity
     {
         /// <summary>
         /// 
         /// </summary>
-        public override EntityTypeEnum Type => EntityTypeEnum.GROUND;
+        public override CCSpriteSheet SpriteSheet => null;
 
         /// <summary>
         /// 
         /// </summary>
-        public override int SubType => 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public Ground()
+        /// <param name="dt"></param>
+        public override void Update(float dt)
         {
-            SetNetworkType(GameObjectNetworkType.SHARE_CREATION_DELETION);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected override void InitializeNetworkParts()
-        {
-            base.InitializeNetworkParts();
+            base.Update(dt);
+            Ghost.PositionX = GetMeterToPoint(PhysicsBody.Position.x);
+            Ghost.PositionY = GetMeterToPoint(PhysicsBody.Position.y);
         }
 
         /// <summary>

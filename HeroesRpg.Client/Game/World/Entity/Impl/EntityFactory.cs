@@ -20,14 +20,14 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
         /// <param name="type"></param>
         /// <param name="entityData"></param>
         /// <returns></returns>
-        public GameObject CreateFromNetwork(EntityTypeEnum type, byte[] entityData)
+        public GameObject CreateFromNetwork(EntityTypeEnum type, int subType, byte[] entityData)
         {
             var reader = new BinaryReader(new MemoryStream(entityData));
             GameObject obj = null;
             switch (type)
             {
                 case EntityTypeEnum.HERO:
-                    var heroType = (HeroTypeEnum)reader.ReadByte();
+                    var heroType = (HeroTypeEnum)subType;
                     switch (heroType)
                     {
                         case HeroTypeEnum.DRAGON_BALL:
@@ -38,6 +38,10 @@ namespace HeroesRpg.Client.Game.World.Entity.Impl
 
                 case EntityTypeEnum.GROUND:
                     obj = new Ground();
+                    break;
+
+                case EntityTypeEnum.PROJECTILE:
+                    obj = new Projectile();
                     break;
             }
             if(obj != null)

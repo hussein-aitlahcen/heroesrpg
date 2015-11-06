@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.IO;
 using HeroesRpg.Protocol.Game.State.Part;
 using HeroesRpg.Protocol.Game.State.Part.Impl;
+using Box2D.Collision.Shapes;
+using Box2D.Dynamics;
 
 namespace HeroesRpg.Server.Game.Entity
 {
@@ -42,10 +44,49 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
+        public float InitialVelocityX
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float InitialVelocityY
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float VelocityX => PhysicsBody == null ? InitialVelocityX : PhysicsBody.LinearVelocity.x;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public float VelocityY => PhysicsBody == null ? InitialVelocityY : PhysicsBody.LinearVelocity.y;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="id"></param>
         public MovableEntity()
             : base(Box2D.Dynamics.b2BodyType.b2_dynamicBody)
         {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="world"></param>
+        /// <param name="ptm"></param>
+        public override void CreatePhysicsBody(b2World world, int ptm)
+        {
+            base.CreatePhysicsBody(world, ptm);
+            SetVelocity(InitialVelocityX, InitialVelocityY);
         }
 
         /// <summary>
@@ -60,9 +101,9 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public override void Update()
+        public override void UpdateBeforePhysics()
         {
-            base.Update();
+            base.UpdateBeforePhysics();
             if(MovementSpeedX != 0 || MovementSpeedY != 0)
             {
                 SetVelocity(MovementSpeedX, MovementSpeedY);
@@ -76,7 +117,9 @@ namespace HeroesRpg.Server.Game.Entity
         /// <param name="y"></param>
         public void SetVelocity(float x, float y)
         {
-            if(PhysicsBody != null)
+            InitialVelocityX = x;
+            InitialVelocityY = y;
+            if (PhysicsBody != null)
             {
                 PhysicsBody.LinearVelocity = new b2Vec2(x, y);
                 OnMovablePartModified();
@@ -148,31 +191,18 @@ namespace HeroesRpg.Server.Game.Entity
         public override void ToNetwork(BinaryWriter writer)
         {
             base.ToNetwork(writer);
-            ToMovableEntityPart(writer);
+            CreateMovableNetworkPart().ToNetwork(writer);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        public void ToMovableEntityPart(BinaryWriter writer)
-        {
-            if (PhysicsBody != null)
-            {
-                writer.Write(PhysicsBody.LinearVelocity.x);
-                writer.Write(PhysicsBody.LinearVelocity.y);
-            }
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         public MovableEntityPart CreateMovableNetworkPart() =>
             new MovableEntityPart(
-                PhysicsBody.LinearVelocity.x,
-                PhysicsBody.LinearVelocity.y,
-                PhysicsBody.Position.x,
-                PhysicsBody.Position.y);
+                PhysicsBody != null ? PhysicsBody.LinearVelocity.x : InitialVelocityX,
+                PhysicsBody != null ? PhysicsBody.LinearVelocity.y : InitialVelocityY,
+                PhysicsBody != null ? PhysicsBody.Position.x : GetPointToMeter(InitialPositionX),
+                PhysicsBody != null ? PhysicsBody.Position.y : GetPointToMeter(InitialPositionY));
     }
 }

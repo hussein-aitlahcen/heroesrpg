@@ -68,6 +68,7 @@
     <Compile Include="Game\Entity\Impl\DragonBallHero.cs" />
     <Compile Include="Game\Entity\Impl\Ground.cs" />
     <Compile Include="Game\Entity\Impl\Hero.cs" />
+    <Compile Include="Game\Entity\Impl\Projectile.cs" />
     <Compile Include="Game\Entity\MovableEntity.cs" />
     <Compile Include="Game\Entity\StaticEntity.cs" />
     <Compile Include="Game\GameSystem.cs" />

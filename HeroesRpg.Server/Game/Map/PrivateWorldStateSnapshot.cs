@@ -37,7 +37,7 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        public double GameTime
+        public long PhysicUpdateSequence
         {
             get;
         }
@@ -56,9 +56,9 @@ namespace HeroesRpg.Server.Game.Map
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public PrivateWorldStateSnapshot(double gameTime)
+        public PrivateWorldStateSnapshot(long physicUpdateSequence)
         {
-            GameTime = gameTime;
+            PhysicUpdateSequence = physicUpdateSequence;
             m_objectSnapshot = new Dictionary<int, GameObjectSnapshot>();
         }
 
