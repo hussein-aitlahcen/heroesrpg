@@ -12,6 +12,7 @@ using HeroesRpg.Client.Game.World.Entity.Impl.Animated;
 using HeroesRpg.Client.Network;
 using HeroesRpg.Protocol.Impl.Game.Command.Client;
 using HeroesRpg.Client.Game.World;
+using HeroesRpg.Client.Game.World.Entity;
 
 namespace HeroesRpg.Client.Game.Graphic.Scene
 {
@@ -58,9 +59,6 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
             base.OnKeyPressed(ev);
             switch (ev.Keys)
             {
-                case CCKeys.Space:
-                    break;
-
                 case CCKeys.Left:
                     MovementX--;
                     SendMovementRequest();
@@ -73,6 +71,10 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
 
                 case CCKeys.A:
                     SendSpellUseRequest();
+                    break;
+
+                case CCKeys.Space:
+                    SendJumpRequest();
                     break;
             }            
         }
@@ -101,9 +103,27 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
         /// <summary>
         /// 
         /// </summary>
+        private void SendJumpRequest()
+        {
+            if(WorldManager.Instance.LocalPlayer != null)
+            {
+                GameClient.Instance.Send(new PlayerJumpRequestMessage());
+
+                var mv = WorldManager.Instance.LocalPlayer as MovableEntity;
+                var impulse = WorldManager.Instance.LocalPlayer.Mass * 60;
+                mv.ApplyLinearImpulse(0, impulse);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void SendSpellUseRequest()
         {
-            GameClient.Instance.Send(new PlayerUseSpellRequestMessage() { SpellId = 0, Angle = 0 });
+            if (WorldManager.Instance.LocalPlayer != null)
+            {
+                GameClient.Instance.Send(new PlayerUseSpellRequestMessage() { SpellId = 0, Angle = 0 });
+            }
         }
 
         /// <summary>
@@ -111,9 +131,9 @@ namespace HeroesRpg.Client.Game.Graphic.Scene
         /// </summary>
         private void SendMovementRequest()
         {
-            GameClient.Instance.Send(new PlayerMovementRequestMessage() { MovementX = MovementX, MovementY = MovementY });
             if (WorldManager.Instance.LocalPlayer != null)
             {
+                GameClient.Instance.Send(new PlayerMovementRequestMessage() { MovementX = MovementX, MovementY = MovementY });
                 WorldManager.Instance.LocalPlayer.SetMovementSpeed(MovementX, MovementY);
             }
         }

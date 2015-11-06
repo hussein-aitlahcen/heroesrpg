@@ -14,8 +14,22 @@ namespace HeroesRpg.Server.Game.Handler.Impl
     /// </summary>
     public sealed class CommandHandler : GameHandler<CommandHandler>,
         IHandle<ClientMessage<PlayerMovementRequestMessage>>,
-        IHandle<ClientMessage<PlayerUseSpellRequestMessage>>
+        IHandle<ClientMessage<PlayerUseSpellRequestMessage>>,
+        IHandle<ClientMessage<PlayerJumpRequestMessage>>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        public void Handle(ClientMessage<PlayerJumpRequestMessage> message)
+        {
+            message
+                .Client
+                .ControlledObject
+                .Map
+                .Tell(new MapInstance.JumpCommand(message.Client.ControlledObject));
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -40,6 +54,6 @@ namespace HeroesRpg.Server.Game.Handler.Impl
                 .ControlledObject
                 .Map
                 .Tell(new MapInstance.MovementCommand(message.Client.ControlledObject, message.Message.MovementX, message.Message.MovementY));
-        }
+        }        
     }
 }

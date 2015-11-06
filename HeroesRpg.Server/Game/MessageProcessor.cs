@@ -53,10 +53,11 @@ namespace HeroesRpg.Server.Game
 
             netmsg
                 .Match()
-                .With<IdentificationMessage>((m) => Handle<ConnectionHandler, IdentificationMessage>(client, m))
-                .With<PhysicsWorldDataRequestMessage>((m) => Handle<MapHandler, PhysicsWorldDataRequestMessage>(client, m))
-                .With<PlayerMovementRequestMessage>((m) => Handle<CommandHandler, PlayerMovementRequestMessage>(client, m))
+                .With<IdentificationMessage>(m => Handle<ConnectionHandler, IdentificationMessage>(client, m))
+                .With<PhysicsWorldDataRequestMessage>(m => Handle<MapHandler, PhysicsWorldDataRequestMessage>(client, m))
+                .With<PlayerMovementRequestMessage>(m => Handle<CommandHandler, PlayerMovementRequestMessage>(client, m))
                 .With<PlayerUseSpellRequestMessage>(m => Handle<CommandHandler, PlayerUseSpellRequestMessage>(client, m))
+                .With<PlayerJumpRequestMessage>(m => Handle<CommandHandler, PlayerJumpRequestMessage>(client, m))
                 .Default((obj) => m_log.Debug("unhandled msg {0}", obj.GetType().Name));
 
             m_log.Info("received < {0}", message.Message.GetType().Name);

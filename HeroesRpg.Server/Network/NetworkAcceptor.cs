@@ -55,7 +55,7 @@ namespace HeroesRpg.Server.Network
         {
             Poll();
 
-            Thread.Sleep(10);
+            Thread.Sleep(1);
 
             Task.Factory.StartNew(HearthBeat);
         }

@@ -101,9 +101,9 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public override void Update()
+        public override void UpdateBeforePhysics()
         {
-            base.Update();
+            base.UpdateBeforePhysics();
             if(MovementSpeedX != 0 || MovementSpeedY != 0)
             {
                 SetVelocity(MovementSpeedX, MovementSpeedY);

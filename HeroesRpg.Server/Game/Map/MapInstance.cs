@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeroesRpg.Server.Game.Map
@@ -79,6 +80,16 @@ namespace HeroesRpg.Server.Game.Map
             {
                 SpellId = spellId;
                 Angle = angle;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public sealed class JumpCommand : MapInstanceMessage
+        {
+            public JumpCommand(GameObject obj) : base(obj)
+            {
             }
         }
 
@@ -147,9 +158,10 @@ namespace HeroesRpg.Server.Game.Map
         IHandle<MapInstance.RemoveEntity>,
         IHandle<PhysicsWorldInstance.EntityBodyCreated>,
         IHandle<PhysicsWorldInstance.EntityBodyDestroyed>,
-        IHandle<PhysicsWorldInstance.TickDone>,
+        IHandle<PhysicsWorldInstance.TakeSnap>,
         IHandle<MapInstance.MovementCommand>,
-        IHandle<MapInstance.SpellUseCommand>
+        IHandle<MapInstance.SpellUseCommand>,
+        IHandle<MapInstance.JumpCommand>
     {
         /// <summary>
         /// 
@@ -184,7 +196,7 @@ namespace HeroesRpg.Server.Game.Map
         /// <summary>
         /// 
         /// </summary>
-        private float m_nextSnapshot;
+        private long m_snapAcumulator;
 
         /// <summary>
         /// 
@@ -197,7 +209,6 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         public MapInstance(int id)
         {
-            m_snapshotTime = Stopwatch.StartNew();
             m_playerCommands = new Queue<Action>();
             m_stateSnapshots = new Queue<PrivateWorldStateSnapshot>();
             m_gameObjects = new Dictionary<int, GameObject>();
@@ -209,6 +220,8 @@ namespace HeroesRpg.Server.Game.Map
         /// </summary>
         public override void AroundPreStart()
         {
+            m_snapshotTime = Stopwatch.StartNew();
+
             var ground = new Ground();
             ground.SetWidth(2000);
             ground.SetHeight(50);
@@ -219,31 +232,31 @@ namespace HeroesRpg.Server.Game.Map
         /// 
         /// </summary>
         /// <param name="message"></param>
-        public void Handle(PhysicsWorldInstance.TickDone message)
+        public void Handle(PhysicsWorldInstance.TakeSnap message)
         {
-            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(0), Sender, PhysicsWorldInstance.Tick.Instance, Self);
-
             while (m_playerCommands.Count > 0)
                 m_playerCommands.Dequeue()();
 
-            // TODO: process client commands            
-            TakeSnapshotIfRequired();            
+            TakeSnapshotIfRequired(message.PhysicUpdateSequence);
+            
+            Context.System.Scheduler.ScheduleTellOnce(TimeSpan.FromMilliseconds(0), Sender, PhysicsWorldInstance.Tick.Instance, Self);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void TakeSnapshotIfRequired()
-        { 
-            if (m_nextSnapshot < m_snapshotTime.ElapsedMilliseconds)
+        private void TakeSnapshotIfRequired(long physicUpdateSequence)
+        {
+            m_snapAcumulator += m_snapshotTime.ElapsedMilliseconds;
+            m_snapshotTime.Restart();
+
+            while (m_snapAcumulator > Constant.UPDATE_RATE_MS)
             {
-                var privateSnap = new PrivateWorldStateSnapshot(Time.TotalMilliseconds);
-                var snapShot = new WorldStateSnapshot(Time.TotalMilliseconds);
+                var privateSnap = new PrivateWorldStateSnapshot(physicUpdateSequence);
+                var snapShot = new WorldStateSnapshot(physicUpdateSequence);
                 foreach (var gameObject in m_gameObjects.Values)
                 {
-                    gameObject.Update();
-
-                    if(gameObject.IsRemovable)
+                    if (gameObject.IsRemovable)
                     {
                         Self.Tell(new RemoveEntity(gameObject));
                     }
@@ -263,7 +276,7 @@ namespace HeroesRpg.Server.Game.Map
                 }
 
                 CleanOutdatedSnapshot(privateSnap);
-                
+
                 var netmsg = new WorldStateSnapshotMessage();
                 using (var stream = new MemoryStream())
                 {
@@ -273,8 +286,8 @@ namespace HeroesRpg.Server.Game.Map
                 }
                 BroadcastUnreliable(netmsg);
 
-                m_nextSnapshot = m_snapshotTime.ElapsedMilliseconds + Constant.UPDATE_RATE_MS;
-            }
+                m_snapAcumulator -= Constant.UPDATE_RATE_MS_LONG;
+            }            
         }
         
         /// <summary>
@@ -449,7 +462,6 @@ namespace HeroesRpg.Server.Game.Map
             {
                 var mv = message.GameObj as MovableEntity;
                 mv.SetMovementSpeed(message.X * 10, message.Y * 10);
-                Logger.Info("movement command : " + message.X);
             });
         }
 
@@ -470,6 +482,22 @@ namespace HeroesRpg.Server.Game.Map
             projectile.SetFixedRotation(true);
             projectile.SetWorldPosition(message.GameObj.WorldPositionX + 50f, message.GameObj.WorldPositionY + 50f);
             Self.Tell(new AddEntity(projectile));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        public void Handle(JumpCommand message)
+        {
+            //float impulse = body->GetMass() * 10;
+            //body->ApplyLinearImpulse(b2Vec2(0, impulse), body->GetWorldCenter());
+            m_playerCommands.Enqueue(() =>
+            {
+                var mv = message.GameObj as MovableEntity;
+                var impulse = message.GameObj.Mass * 60;
+                mv.ApplyLinearImpulseToCenter(0, impulse);
+            });
         }
     }
 }

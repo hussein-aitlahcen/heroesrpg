@@ -103,6 +103,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                 .With<ClientControlledObjectMessage>((m) =>
                 {
                     WorldManager.Instance.ControlledObjectId = m.ObjectId;
+                    processed = true;
                 })
                 .With<EntitySpawMessage>((entitySpawn) =>
                 {
@@ -125,6 +126,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                 .With<EntityDestroyMessage>(entityDestroyed =>
                 {
                     MapInstance.Instance.RemoveGameObject(entityDestroyed.ObjectId);
+                    processed = true;
                 })
                 .With<WorldStateSnapshotMessage>((m) =>
                 {
@@ -137,6 +139,7 @@ namespace HeroesRpg.Client.Game.Graphic.Layer
                         }
                     }
                     WorldManager.Instance.AddWorldStateSnapshot(snapshot);
+                    processed = true;
                 });
             return processed;
         }

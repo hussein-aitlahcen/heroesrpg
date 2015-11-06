@@ -130,10 +130,7 @@ namespace HeroesRpg.Client.Game.World.Entity
         public override void Update(float dt)
         {
             base.Update(dt);
-            if (MovementSpeedX != 0 || MovementSpeedY != 0)
-            {
-                SetVelocity(MovementSpeedX, MovementSpeedY);
-            }
+           
             if (PhysicsBody != null)
             {
                 if (IsPositionCorrection)
@@ -144,6 +141,19 @@ namespace HeroesRpg.Client.Game.World.Entity
 
                     PhysicsBody.SetTransform(new b2Vec2(interpolation.X, interpolation.Y), PhysicsBody.Angle);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dt"></param>
+        public override void UpdateBeforePhysics(float dt)
+        {
+            base.UpdateBeforePhysics(dt);
+            if (MovementSpeedX != 0 || MovementSpeedY != 0)
+            {
+                SetVelocity(MovementSpeedX, MovementSpeedY);
             }
         }
 
@@ -210,12 +220,7 @@ namespace HeroesRpg.Client.Game.World.Entity
             {
                 if (PhysicsBody.LinearVelocity.x == x && PhysicsBody.LinearVelocity.y == y)
                     return;
-
-                if (IsLocal && WorldManager.Instance.IsVelocityInterpolationValid(x, y))
-                {
-                    Logger.Debug("velocity prediction valid, SKIPP");
-                    return;
-                }
+                
                 PhysicsBody.LinearVelocity = new b2Vec2(x, y);
             }
         }
@@ -224,11 +229,11 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// 
         /// </summary>
         /// <param name="impulse"></param>
-        public void ApplyLinearImpulse(b2Vec2 impulse)
+        public void ApplyLinearImpulse(float x, float y)
         {
             if(PhysicsBody != null)
             {
-                PhysicsBody.ApplyLinearImpulse(impulse, PhysicsBody.WorldCenter);
+                PhysicsBody.ApplyLinearImpulse(new b2Vec2(x, y), PhysicsBody.WorldCenter);
             }
         }
 
@@ -253,25 +258,23 @@ namespace HeroesRpg.Client.Game.World.Entity
         {
             if (PhysicsBody != null)
             {
-                var worldX = GetMeterToPoint(nextX);
-                var worldY = GetMeterToPoint(nextY);
-                var realDiffX = PositionX - worldX;
-                var realDiffY = PositionY - worldY;
-                var diffX = Math.Abs(worldX - PositionX);
-                var diffY = Math.Abs(worldY - PositionY);
-
-                if (IsLocal)
+                if (WorldManager.Instance.HasInterpolatedLocalEntityState(Id))
                 {
-                    if (WorldManager.Instance.IsPositionInterpolationValid(nextX, nextY))                    
-                        return;
+                    var state = WorldManager.Instance.GetInterpolatedEntityState(Id);
 
-                    if (realDiffX > 0 && MovementSpeedX > 0)
-                        nextX = nextX + realDiffX / 2;
-                    if(realDiffY > 0 && MovementSpeedY > 0)
-                        nextY = nextY + realDiffY / 2;
-                    CorrectionX = nextX;
-                    CorrectionY = nextY;
-                    CorrectionTime = UpdateTime + Constant.UPDATE_RATE_SECOND;
+                    var diffX = state.PositionX - nextX;
+                    var diffY = state.PositionY - nextY;
+                    var absX = Math.Abs(diffX);
+                    var absY = Math.Abs(diffY);
+
+                    Logger.Debug($"diffX={absX} time={WorldManager.Instance.InterpolationState.PhysicUpdateSequence - WorldManager.Instance.ServerPhysicUpdateSequence}");
+                    
+                    if (absX > WorldManager.CL_INTERPOLATION_ERROR || absY > WorldManager.CL_INTERPOLATION_ERROR)
+                    {
+                        CorrectionX = nextX;
+                        CorrectionY = nextY;
+                        CorrectionTime = UpdateTime + Constant.UPDATE_RATE_SECOND;
+                    }
                 }
                 else
                 {

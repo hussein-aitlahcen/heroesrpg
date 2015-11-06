@@ -26,7 +26,12 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
-        public const float CL_INTERPOLATION = 0.1f;
+        public const float CL_INTERPOLATION = 0.10f;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const double CL_INTERPOLATION_ERROR = 0.5;
 
         /// <summary>
         /// 
@@ -41,12 +46,17 @@ namespace HeroesRpg.Client.Game.World
         /// <summary>
         /// 
         /// </summary>
-        private long m_gameTime;
+        private long m_serverPhysicUpdateSequence;
 
         /// <summary>
         /// 
         /// </summary>
-        public long GameTime => m_gameTime;
+        public long ServerPhysicUpdateSequence => m_serverPhysicUpdateSequence;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private long m_initialServerPhysicUpdateSequence;
 
         /// <summary>
         /// 
@@ -96,7 +106,7 @@ namespace HeroesRpg.Client.Game.World
         {
             m_localSnapshots.Clear();
             m_stateSnapshots.Clear();
-            m_gameTime = -1;
+            m_serverPhysicUpdateSequence = 0;
         }
 
         /// <summary>
@@ -110,61 +120,31 @@ namespace HeroesRpg.Client.Game.World
         /// </summary>
         /// <returns></returns>
         public bool IsLocalSnapshotBuffered() => InterpolationState != null;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool HasInterpolatedLocalEntityState(int id) => IsLocalSnapshotBuffered() && InterpolationState.ContainsGameObjectState(id);
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="currentX"></param>
-        /// <param name="currentY"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        public bool IsPositionInterpolationValid(float nextX, float nextY)
-        {
-            // minium required
-            if (!IsLocalSnapshotBuffered())
-                return true;
-            
-            var diffX = Math.Abs(InterpolationState.PositionX - nextX);
-            var diffY = Math.Abs(InterpolationState.PositionY - nextY);
-            var diffTime = GameTime - InterpolationState.GameTime;
-                        
-            return
-                (diffX <= 1 &&
-                diffY <= 1 );
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="nextVelocityX"></param>
-        /// <param name="nextVelocityY"></param>
-        /// <returns></returns>
-        public bool IsVelocityInterpolationValid(float nextVelocityX, float nextVelocityY)
-        {
-            // minium required
-            if (!IsLocalSnapshotBuffered())
-                return true;
-
-            var diffX = Math.Abs(InterpolationState.VelocityX - nextVelocityX);
-            var diffY = Math.Abs(InterpolationState.VelocityY - nextVelocityY);
-
-            return diffX <= 0.05 && diffY <= 0.05;
-        }
+        public LocalEntityState GetInterpolatedEntityState(int id) => InterpolationState.GetGameObjectState(id);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="snapShot"></param>
-        public void AddLocalStateSnapshot()
-        {
-            if (LocalPlayer != null)
-            {
-                m_localSnapshots.Enqueue(new LocalStateSnapshot(
-                    Time.TotalMilliseconds + (long)(CL_INTERPOLATION * 1000),
-                    LocalPlayer.PhysicPositionX,
-                    LocalPlayer.PhysicPositionY,
-                    LocalPlayer.VelocityX,
-                    LocalPlayer.VelocityY));
-            }
+        public void AddLocalStateSnapshot(long physicUpdateSequence)
+        {            
+            var snapShot = new LocalStateSnapshot(physicUpdateSequence + m_initialServerPhysicUpdateSequence);
+            foreach (var obj in MapInstance.Instance.GameObjects)
+                snapShot.AddEntityState(obj.Id, obj.PhysicPositionX, obj.PhysicPositionY);
+            m_localSnapshots.Enqueue(snapShot);            
         }
 
         /// <summary>
@@ -173,16 +153,14 @@ namespace HeroesRpg.Client.Game.World
         /// <param name="snapShot"></param>
         public void AddWorldStateSnapshot(WorldStateSnapshot snapShot)
         {
-            if (snapShot.GameTime >= m_gameTime)
+            if (snapShot.PhysicUpdateSequence >= m_serverPhysicUpdateSequence)
             {
-                m_gameTime = snapShot.GameTime;
+                m_serverPhysicUpdateSequence = snapShot.PhysicUpdateSequence;
                 m_stateSnapshots.Enqueue(snapShot);
-                AddLocalStateSnapshot();
             }
-            else
-            {
-                Log.Debug($"old world snap reveived time={snapShot.GameTime}, realtime={m_gameTime}");
-            }
+            if (m_stateSnapshots.Count == 1)
+                m_initialServerPhysicUpdateSequence = snapShot.PhysicUpdateSequence;
+            AddLocalStateSnapshot(MapInstance.Instance.ClientPhysicUpdateSequence);
         }
 
         /// <summary>
@@ -193,9 +171,11 @@ namespace HeroesRpg.Client.Game.World
             if (IsSnapshotBuffered())
             {
                 var worldState = m_stateSnapshots.Dequeue();
-                if (m_localSnapshots.Count > MIN_SNAP_BUFFER + 1)
+
+                if(m_localSnapshots.Count > MIN_SNAP_BUFFER)
                     InterpolationState = m_localSnapshots.Dequeue();
-                MapInstance.Instance.UpdateEntities(worldState);
+
+                MapInstance.Instance.UpdateEntitiesFromNet(worldState);
             }           
         }
     }

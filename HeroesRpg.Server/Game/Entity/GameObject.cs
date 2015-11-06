@@ -752,7 +752,7 @@ namespace HeroesRpg.Server.Game.Entity
         /// <summary>
         /// 
         /// </summary>
-        public virtual void Update()
+        public virtual void UpdateBeforePhysics()
         {
         }        
     }

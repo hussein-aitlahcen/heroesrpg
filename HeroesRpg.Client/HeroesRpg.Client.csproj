@@ -97,6 +97,7 @@
     <Compile Include="Game\World\Entity\EntityDecoration.cs" />
     <Compile Include="Game\World\Entity\MovableEntity.cs" />
     <Compile Include="Game\World\Entity\StaticEntity.cs" />
+    <Compile Include="Game\World\LocalEntityState.cs" />
     <Compile Include="Game\World\LocalStateSnapshot.cs" />
     <Compile Include="Game\World\MapInstance.cs" />
     <Compile Include="Game\World\WorldManager.cs" />

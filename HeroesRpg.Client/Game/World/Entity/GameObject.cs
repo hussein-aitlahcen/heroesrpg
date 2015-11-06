@@ -300,6 +300,13 @@ namespace HeroesRpg.Client.Game.World.Entity
         /// <summary>
         /// 
         /// </summary>
+        public virtual void UpdateBeforePhysics(float dt)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="mass"></param>
         public void SetMass(float mass)
         {

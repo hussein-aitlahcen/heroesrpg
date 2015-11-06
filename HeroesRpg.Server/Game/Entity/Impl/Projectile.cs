@@ -34,9 +34,9 @@ namespace HeroesRpg.Server.Game.Entity.Impl
         /// <summary>
         /// 
         /// </summary>
-        public override void Update()
+        public override void UpdateBeforePhysics()
         {
-            base.Update();
+            base.UpdateBeforePhysics();
             IsRemovable = WorldPositionX > 1024 || WorldPositionX < 0;
         }
 

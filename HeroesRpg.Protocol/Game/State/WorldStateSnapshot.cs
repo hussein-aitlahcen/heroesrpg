@@ -15,7 +15,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// <summary>
         /// 
         /// </summary>
-        public long GameTime
+        public long PhysicUpdateSequence
         {
             get;
             private set;
@@ -41,9 +41,9 @@ namespace HeroesRpg.Protocol.Game.State
         /// 
         /// </summary>
         /// <param name="gameTime"></param>
-        public WorldStateSnapshot(long gameTime) : this()
+        public WorldStateSnapshot(long physicUpdateSequence) : this()
         {
-            GameTime = gameTime;
+            PhysicUpdateSequence = physicUpdateSequence;
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// <param name="writer"></param>
         public void ToNetwork(BinaryWriter writer)
         {
-            writer.Write(GameTime);
+            writer.Write(PhysicUpdateSequence);
 
             // header including size
             writer.Write(m_states.Count);
@@ -103,7 +103,7 @@ namespace HeroesRpg.Protocol.Game.State
         /// <param name="reader"></param>
         public void FromNetwork(BinaryReader reader)
         {
-            GameTime = reader.ReadInt64();
+            PhysicUpdateSequence = reader.ReadInt64();
 
             var size = reader.ReadInt32();
             for(var i = 0; i < size; i++)
